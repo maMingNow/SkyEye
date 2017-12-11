@@ -15,11 +15,11 @@ import java.net.UnknownHostException;
  */
 public class SysUtil {
 
-    public static String host = Constants.EMPTY_STR;
-    public static String userDir = Constants.EMPTY_STR;
+    public static String host = Constants.EMPTY_STR;//本地节点的host名字
+    public static String userDir = Constants.EMPTY_STR;//本地的工作目录
 
     static {
-        if (System.getenv("COMPUTERNAME") != null) {
+        if (System.getenv("COMPUTERNAME") != null) {//自定义
             host = System.getenv("COMPUTERNAME");
         } else {
             try {

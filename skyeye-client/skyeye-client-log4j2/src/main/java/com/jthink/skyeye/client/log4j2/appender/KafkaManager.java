@@ -46,11 +46,11 @@ public class KafkaManager extends AbstractManager {
     private Map<String, Object> config = new HashMap<>();
     // zk注册器
     private ZkRegister zkRegister;
-    private byte[] key;
+    private byte[] key;//是app+host组成的hash值,保证同一个host上的app可以在kafka的同一个partition中
     // 心跳检测
     private Timer timer;
     // 原始app
-    private String orginApp;
+    private String orginApp;//因为app的名字在同一个节点上可能会部署多个.因此会被更改成app#number,因此记录一下原始app内容
 
     public KafkaManager(final LoggerContext loggerContext, final String name, final String topic, final String zkServers, final String mail, final  String rpc,
                         final String app, final String host, final Property[] properties) {
@@ -80,7 +80,7 @@ public class KafkaManager extends AbstractManager {
         this.zkRegister = new ZkRegister(new ZkClient(this.zkServers, 60000, 5000));
         // 对app重新编号，防止一台host部署一个app的多个实例
         this.app = this.zkRegister.mark(this.app, this.host);
-        // 设置key
+        // 设置key---是app+host组成的hash值
         this.key = ByteBuffer.allocate(4).putInt(new StringBuilder(this.app).append(this.host).toString().hashCode()).array();
 
         // 注册节点
@@ -120,9 +120,12 @@ public class KafkaManager extends AbstractManager {
         if (null != this.timer) {
             this.timer.cancel();
         }
+        //关闭kafka的生产者的流
         if (LazySingletonProducer.isInstanced()) {
             LazySingletonProducer.getInstance(KafkaManager.this.config).close();
         }
+
+        //关闭zookeeper
         ZkClient client = this.zkRegister == null ? null : this.zkRegister.getClient();
         if (null != client) {
             client.close();

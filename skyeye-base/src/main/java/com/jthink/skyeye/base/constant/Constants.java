@@ -112,8 +112,8 @@ public class Constants {
     public static final String THIRD = "third";
 
     // zk节点
-    public static final String ROOT_PATH_EPHEMERAL = "/skyeye/monitor/scroll";
-    public static final String ROOT_PATH_PERSISTENT = "/skyeye/monitor/query";
+    public static final String ROOT_PATH_EPHEMERAL = "/skyeye/monitor/scroll";//临时节点的根节点
+    public static final String ROOT_PATH_PERSISTENT = "/skyeye/monitor/query";//永久节点的根节点
     public static final String APPENDER_INIT_DATA = "appender_init_data";
 
     public static final String EMPTY_STR = "";
@@ -133,9 +133,9 @@ public class Constants {
     public static final String WECHAT_ALERT_MSG = "详情: ";
     public static final String APP_START = "start";
     public static final String APP_STOP = "stop";
-    public static final String APP_APPENDER_RESTART_KEY = "restart";
+    public static final String APP_APPENDER_RESTART_KEY = "restart";//kafka重新连接成功
     public static final String APP_APPENDER_RESTART = "kafka appender restart";
-    public static final String APP_APPENDER_STOP_KEY = "stop";
+    public static final String APP_APPENDER_STOP_KEY = "stop";//kafka连接失败
     public static final String APP_APPENDER_STOP = "kafka appender stop";
     public static final String WECHAT_ALERT_RESPONSE_EXCEED = "响应时间超过阈值";
 
@@ -226,7 +226,7 @@ public class Constants {
     public static final String TRACE_TABLE_NAME = "rpctrace";
 
     // 心跳检测相关
-    public static final String HEARTBEAT_KEY = "heart beat key";
-    public static final String HEARTBEAT_VALUE = "heart beat value";
+    public static final String HEARTBEAT_KEY = "heart beat key";//心跳的key
+    public static final String HEARTBEAT_VALUE = "heart beat value";//心跳的具体的值
 
 }

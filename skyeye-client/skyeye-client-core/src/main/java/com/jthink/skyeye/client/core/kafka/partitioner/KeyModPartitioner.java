@@ -20,7 +20,7 @@ public class KeyModPartitioner implements Partitioner {
 
     @Override
     public int partition(String topic, Object key, byte[] keyBytes, Object value, byte[] valueBytes, Cluster cluster) {
-        List<PartitionInfo> partitions = cluster.partitionsForTopic(topic);
+        List<PartitionInfo> partitions = cluster.partitionsForTopic(topic);//该topic有多少个partition
         int numPartitions = partitions.size();
         int partitionNum = 0;
         try {

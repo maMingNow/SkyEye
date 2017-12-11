@@ -40,7 +40,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 @Plugin(name = "KafkaCustomize", category = Node.CATEGORY, elementType = Appender.ELEMENT_TYPE, printObject = true)
 public class KafkaAppender extends AbstractAppender {
 
-    private final KafkaManager manager;
+    private final KafkaManager manager;//管理kafka的配置信息以及如何向zookeeper进行节点注册
 
     // kafkaAppender遇到异常需要向zk进行写入数据，由于onCompletion()的调用在kafka集群完全挂掉时会有很多阻塞的日志会调用，所以我们需要保证只向zk写一次数据，监控中心只会发生一次报警
     private volatile AtomicBoolean flag = new AtomicBoolean(true);
@@ -98,12 +98,13 @@ public class KafkaAppender extends AbstractAppender {
                 if (value.length() > 10000) {
                     return;
                 }
-                final ProducerRecord<byte[], String> record = new ProducerRecord<>(this.manager.getTopic(), this.manager.getKey(), value.replaceFirst(this.manager.getOrginApp(), this.manager.getApp()));
+                //创建一个生产者数据,value是log日志内容,key表示host+appName对应的hash值,保证同一个host上的app可以在kafka的同一个partition中
+                final ProducerRecord<byte[], String> record = new ProducerRecord<>(this.manager.getTopic(), this.manager.getKey(), value.replaceFirst(this.manager.getOrginApp(), this.manager.getApp()));//将原始的app内容转换成新的app
                 LazySingletonProducer.getInstance(this.manager.getConfig()).send(record, new Callback() {
                     @Override
                     public void onCompletion(RecordMetadata recordMetadata, Exception e) {
                         // TODO: 异常发生如何处理(目前使用RollingFileAppender.java中的方法)
-                        if (null != e) {
+                        if (null != e) {//说明kafka写入数据出现异常了
                             // 设置停止
                             setStopped();
                             LOGGER.error("kafka send error in appender", e);
@@ -112,6 +113,8 @@ public class KafkaAppender extends AbstractAppender {
                                 // 启动心跳检测机制
                                 KafkaAppender.this.heartbeatStart();
                                 // 向zk通知
+                                // /app/host下创建临时节点,写入stop : System.currentTimeMillis() : 服务位置
+                                //即该app/host在哪个位置部署的,已经失败连接上kafka了,在某个时间点
                                 KafkaAppender.this.manager.getZkRegister().write(Constants.SLASH + KafkaAppender.this.manager.getApp() + Constants.SLASH +
                                                 KafkaAppender.this.manager.getHost(), NodeMode.EPHEMERAL,
                                         String.valueOf(Constants.APP_APPENDER_STOP_KEY + Constants.SEMICOLON + System.currentTimeMillis()) + Constants.SEMICOLON + SysUtil.userDir);
@@ -138,6 +141,7 @@ public class KafkaAppender extends AbstractAppender {
             @Override
             public void run() {
                 byte[] key = ByteBuffer.allocate(4).putInt(Constants.HEARTBEAT_KEY.hashCode()).array();
+                //向kafka的topic发送一个心跳,保证kafka是通的
                 final ProducerRecord<byte[], String> record = new ProducerRecord<>(KafkaAppender.this.manager.getTopic(), key, Constants.HEARTBEAT_VALUE);
 
                 // java 8 lambda
@@ -148,14 +152,16 @@ public class KafkaAppender extends AbstractAppender {
                 LazySingletonProducer.getInstance(KafkaAppender.this.manager.getConfig()).send(record, new Callback() {
                     @Override
                     public void onCompletion(RecordMetadata recordMetadata, Exception e) {
-                        if (null == e) {
+                        if (null == e) {//说明kafka没有异常
                             // 更新flag状态
-                            flag.compareAndSet(false, true);
+                            flag.compareAndSet(false, true);//说明以前kafka有失败的时候,更新成没异常
                             // 如果没有发生异常, 说明kafka从异常状态切换为正常状态, 将开始状态设置为true
                             setStarted();
                             LOGGER.info("kafka send normal in appender", e);
                             // 关闭心跳检测机制
                             KafkaAppender.this.heartbeatStop();
+                            //  /app#number/host 创建一个临时节点,写入数据restart : System.currentTimeMillis() : app位置,
+                            //即该app/host在哪个位置部署的,已经重新开始连接上kafka了,在某个时间点
                             KafkaAppender.this.manager.getZkRegister().write(Constants.SLASH + KafkaAppender.this.manager.getApp() +
                                             Constants.SLASH + KafkaAppender.this.manager.getHost(), NodeMode.EPHEMERAL,
                                     String.valueOf(Constants.APP_APPENDER_RESTART_KEY + Constants.SEMICOLON + System.currentTimeMillis()) + Constants.SEMICOLON + SysUtil.userDir);
