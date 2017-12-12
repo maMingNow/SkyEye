@@ -20,7 +20,7 @@ import javax.persistence.Table;
 public class ServiceInfo {
 
     @Id
-    private ServiceInfoPK serviceInfoPK;
+    private ServiceInfoPK serviceInfoPK;//服务的主键表
     // 为该服务分配的id, 每个iface作为一个service，同一个iface有1或多个method, 该id设置为serviceId（即，iface_method）
     @Column(name = "sid", nullable = false)
     private String sid;

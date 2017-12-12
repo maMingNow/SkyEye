@@ -15,7 +15,8 @@ compile "skyeye:skyeye-client-logback:1.2.0"
 ```
 ### 配置
 在logback.xml中加入一个kafkaAppender，并在properties中配置好相关的值，如下（rpc这个项目前支持none和dubbo，所以如果项目中有dubbo服务的配置成dubbo，没有dubbo服务的配置成none，以后会支持其他的rpc框架，如：thrift、spring cloud等）：
-
+格式 时间;app;host;调用日志的线程;日志级别;调用class的路径;出问题的代码行;代码中指定的日志内容+回车换行
+pattern="%d{yyyy-MM-dd HH:mm:ss.SSS};${APP_NAME};${hostName};%t;%-5level;%logger{96};%line;%msg%n"
 ``` xml
 <property name="APP_NAME" value="your-app-name" />
 <!-- kafka appender -->

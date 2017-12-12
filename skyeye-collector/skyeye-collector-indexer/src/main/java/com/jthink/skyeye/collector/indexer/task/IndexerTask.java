@@ -32,6 +32,7 @@ import static org.elasticsearch.common.xcontent.XContentFactory.jsonBuilder;
  * @version 0.0.1
  * @desc kafka2es 建立index的task
  * @date 2016-09-20 10:25:13
+ * 为每一个日志进行es索引
  */
 @Component
 public class IndexerTask implements Task {

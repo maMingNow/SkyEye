@@ -22,6 +22,7 @@ public class RabbitmqService {
     @Autowired
     private RabbitTemplate rabbitTemplate;
 
+    //向mail邮件地址发送信息,信息内容是info
     public void sendMessage(String info, String mail) {
         this.rabbitTemplate.convertAndSend(this.buildMailDto(info, mail));
     }

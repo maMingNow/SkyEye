@@ -120,7 +120,7 @@ public class Constants {
 
     // mail
     public static final String MONITOR_APP_ALERT = "【app】SkyEye监控中心";
-    public static final String MONITOR_MAIL_SUBJECT = "[SkyEye]-alarm app alert";
+    public static final String MONITOR_MAIL_SUBJECT = "[SkyEye]-alarm app alert";//邮件主题
     public static final String MONITOR_MAIL_INFO_EXEC = "execute";
     public static final String MONITOR_MAIL_INFO_CALL = "call";
     public static final String MONITOR_MAIL_INFO_REQUEST = "request";
@@ -192,8 +192,8 @@ public class Constants {
     public static final String MONTH = "month";
     public static final String YEAR = "year";
     public static final String UNIQUE_NAME = "uniqueName";
-    public static final String COST = "cost";
-    public static final String STATUS = "status";
+    public static final String COST = "cost";//消耗的时间
+    public static final String STATUS = "status";//成功还是失败
 
     // spark任务相关
     public static final String KAFKA_GROUP_ID_CONFIG = "group.id";

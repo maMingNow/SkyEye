@@ -16,11 +16,11 @@ import java.io.Serializable;
 public class ServiceInfoPK implements Serializable {
 
     // 服务的接口名
-    @Column(name = "iface", nullable = false)
+    @Column(name = "iface", nullable = false) //服务的接口
     private String iface;
     // 服务的方法名
     @Column(name = "method", nullable = false)
-    private String method;
+    private String method;//接口中的一个方法
 
     public ServiceInfoPK() {
 

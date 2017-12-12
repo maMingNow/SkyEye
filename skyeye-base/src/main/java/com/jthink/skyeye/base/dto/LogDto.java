@@ -26,7 +26,7 @@ public class LogDto {
     private String eventType;
     private String pack;
     private String clazz;
-    private String line;
+    private String line;//出问题的行号
     private String messageSmart;
     private String messageMax;
 
@@ -50,11 +50,19 @@ public class LogDto {
         this.messageMax = messageMax;
     }
 
+    //日志内容System.nanoTime() + Constants.SEMICOLON + 原始log格式的日志
+    //具体参见log4j2客户端关于KafkaAppender的实现
+    /**
+     * 原始日志格式是:时间;app;host;调用日志的线程;日志级别;调用class的路径;出问题的代码行;代码中指定的日志内容+回车换行
+     * pattern="%d{yyyy-MM-dd HH:mm:ss.SSS};${APP_NAME};${hostName};%t;%-5level;%logger{96};%line;%msg%n"
+     * 具体参见客户端client项目中的readme.md里面的模版
+     */
+
     public LogDto(String log) {
-        String[] detail = log.split(Constants.SEMICOLON, 9);
+        String[] detail = log.split(Constants.SEMICOLON, 9);//按照;拆分
         String date = detail[1];
         this.day = date.substring(0, 10).trim();
-        this.time = date.substring(11).trim();
+        this.time = date.substring(11).trim();//HH:mm:ss.SSS
         this.nanoTime = detail[0].trim();
         this.created = new Date(System.currentTimeMillis());
         this.app = detail[2].trim();
@@ -70,7 +78,7 @@ public class LogDto {
         }
         this.line = detail[7].trim();
         String message = detail[8].trim();
-        this.eventType = EventLog.parseEventType(message).symbol();
+        this.eventType = EventLog.parseEventType(message).symbol();//日志类型是通过输出的日志内容中前缀进行判断的,前缀一定是以|之前的就是日志类型
         this.messageSmart = message;
         this.messageMax = message;
     }

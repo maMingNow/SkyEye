@@ -11,10 +11,12 @@ import java.io.Serializable;
  * @version 0.0.1
  * @desc
  * @date 2016-10-09 09:59:45
+ * 表示一个app对象
  */
 @Embeddable
 public class AppInfoPK implements Serializable {
 
+    //app对象所在服务器地址 以及app名字,以及app类型
     @Column(name = "host", nullable = false)
     private String host;
     @Column(name = "app", nullable = false)

@@ -90,10 +90,12 @@ public class ZkRegister {
     public void registerNode(String host, String app, String mail) {
         // 注册永久节点用于历史日志查询
         this.create(Constants.SLASH + app + Constants.SLASH + host, NodeMode.PERSISTENT);
+        ///skyeye/monitor/query
         this.getClient().writeData(Constants.ROOT_PATH_PERSISTENT + Constants.SLASH + app + Constants.SLASH + host,
                 mail + Constants.SEMICOLON + SysUtil.userDir);//在/app/host下面写入数据 mail:项目路径
         // 注册临时节点用于日志滚屏
-        this.getClient().createPersistent(Constants.ROOT_PATH_EPHEMERAL + Constants.SLASH + app, true);
+        ///skyeye/monitor/scroll
+        this.getClient().createPersistent(Constants.ROOT_PATH_EPHEMERAL + Constants.SLASH + app, true);//app是永久节点,但是下面的host是临时节点.因此可以知道谁还在活着
         this.create(Constants.SLASH + app + Constants.SLASH + host, NodeMode.EPHEMERAL,
                 Constants.APPENDER_INIT_DATA + Constants.SEMICOLON + SysUtil.userDir);// /app/host上创建临时目录,写入数据是 appender_init_data : 项目目录
     }

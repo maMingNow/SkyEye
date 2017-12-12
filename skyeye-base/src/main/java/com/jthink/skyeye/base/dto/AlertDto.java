@@ -5,7 +5,7 @@ import com.jthink.skyeye.base.util.StringUtil;
 
 /**
  * JThink@JThink
- *
+ * 用于报警信息的封装
  * @author JThink
  * @version 0.0.1
  * @desc 报警dto
@@ -19,9 +19,9 @@ public class AlertDto {
 
     private String host;
 
-    private String deploy;
+    private String deploy;//app部署在服务器的路径
 
-    private String msg;
+    private String msg;//报警信息
 
     public AlertDto() {
     }

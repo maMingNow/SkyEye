@@ -48,6 +48,7 @@ public class HbaseTemplate implements HbaseOperations {
         Assert.notNull(configuration, " a valid configuration is required");
     }
 
+    //对某个hbase的表进行一个操作,具体操作在action实现类中实现
     @Override
     public <T> T execute(String tableName, TableCallback<T> action) {
         Assert.notNull(action, "Callback object must not be null");
@@ -61,7 +62,7 @@ public class HbaseTemplate implements HbaseOperations {
             table = this.getConnection().getTable(TableName.valueOf(tableName));
             return action.doInTable(table);
         } catch (Throwable throwable) {
-            status = EventLog.MONITOR_STATUS_FAILED;
+            status = EventLog.MONITOR_STATUS_FAILED;//执行失败
             throw new HbaseSystemException(throwable);
         } finally {
             if (null != table) {

@@ -33,6 +33,7 @@ public class Indexer extends Job {
     private TransportClient transportClient;
     private EsProperties esProperties;
 
+    //可以接收的事件类型集合
     public Indexer(List<EventType> types) {
         super(types);
     }
@@ -40,8 +41,10 @@ public class Indexer extends Job {
     @Override
     public void doJob(EventLog log, LogDto logDto, BulkRequestBuilder bulkRequest) {
         // 进行索引（for kibana），包含api调用、第三方调用、中间件调用
+        //对符合事件类型的事件,并且状态是成功或者失败的事件,进行处理
         if (this.getTypes().indexOf(log.getEventType()) != -1 && (log.getStatus().equals(EventLog.MONITOR_STATUS_FAILED) || log.getStatus().equals(EventLog.MONITOR_STATUS_SUCCESS))) {
             try {
+                //向该index索引插入一条数据
                 bulkRequest.add(transportClient.prepareIndex(this.esProperties.getIndex(), this.esProperties.getDoc())
                         .setSource(this.buildXContentBuilder(log, logDto)));
             } catch (IOException e) {
@@ -57,6 +60,7 @@ public class Indexer extends Job {
 
     /**
      * 根据log相关信息构造XContentBuilder
+     * 构建es的一条数据记录,即一行数据内容
      * @param log
      * @param logDto
      * @return
@@ -64,7 +68,7 @@ public class Indexer extends Job {
      */
     private XContentBuilder buildXContentBuilder(EventLog log, LogDto logDto) throws IOException {
         String day = logDto.getDay();
-        String[] ymd = day.split(Constants.MIDDLE_LINE);
+        String[] ymd = day.split(Constants.MIDDLE_LINE);//按照-进行拆分日期
         String account = Constants.EMPTY_STR;
         if (log instanceof ApiLog) {
             account = ((ApiLog) log).getAccount();

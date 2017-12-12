@@ -74,43 +74,43 @@ public class RpcTraceTask implements Task {
             while (true) {
                 ConsumerRecords<byte[], String> records = this.kafkaConsumer.poll(this.kafkaProperties.getPollTimeout());
                 if (!records.isEmpty()) {
-                    List<Mutation> spanPuts = new ArrayList<Mutation>();
-                    List<Mutation> annotationPuts = new ArrayList<Mutation>();
-                    List<Mutation> tracePuts = new ArrayList<Mutation>();
+                    List<Mutation> spanPuts = new ArrayList<Mutation>();//trace 这个key存在
+                    List<Mutation> annotationPuts = new ArrayList<Mutation>();//annotation这个key存在
+                    List<Mutation> tracePuts = new ArrayList<Mutation>();//time_consume这个key存在
                     for (ConsumerRecord<byte[], String> record : records) {
                         String value = record.value();
                         LogDto logDto = this.getLogDto(value);
                         if (logDto != null) {
-                            String logValue = logDto.getMessageMax();
+                            String logValue = logDto.getMessageMax();//用户输入的日志内容
                             String type = EventLog.parseEventType(logValue).symbol();
-                            if (type.equals(EventType.rpc_trace.symbol())) {
+                            if (type.equals(EventType.rpc_trace.symbol())) {//该事件是rpc事件
                                 // 如果是rpc trace日志
                                 RpcTraceLog log = RpcTraceLog.parseRpcTraceLog(logValue);
-                                String logContent = log.getLog();
+                                String logContent = log.getLog();//具体rpc日志内容
                                 // 将span的json字符串转换成Span对象
                                 Span span = JSON.parseObject(logContent, Span.class);
 
                                 // 采集iface和method
                                 String serviceId = span.getServiceId();
-                                ServiceInfo serviceInfo = this.buildServiceInfo(serviceId);
+                                ServiceInfo serviceInfo = this.buildServiceInfo(serviceId);//构建一个服务对象,即接口+服务方法组成的对象
                                 if (null != serviceInfo) {
-                                    if (!this.cacheService.isExists(CacheService.SERVICE_INFO_TYPE, serviceInfo.getSid())) {
+                                    if (!this.cacheService.isExists(CacheService.SERVICE_INFO_TYPE, serviceInfo.getSid())) {//查看该redis的事件key是否包含了该接口+方法组成的服务
                                         // 如果api不存在
                                         LOGGER.info("从rpc trace中采集到service, 为: {}", serviceId);
-                                        this.cacheService.save(serviceInfo);
-                                        this.cacheService.add(CacheService.SERVICE_INFO_TYPE, serviceInfo.getSid());
+                                        this.cacheService.save(serviceInfo);//保存到数据库
+                                        this.cacheService.add(CacheService.SERVICE_INFO_TYPE, serviceInfo.getSid());//保存到redis
                                     }
                                 }
 
                                 // 存储进入hbase
                                 Map<String, List<Put>> puts = this.hbaseStore.store(logContent, span);
-                                if (puts.containsKey(Constants.TABLE_TRACE)) {
+                                if (puts.containsKey(Constants.TABLE_TRACE)) {//trace 这个key存在
                                     spanPuts.addAll(puts.get(Constants.TABLE_TRACE));
                                 }
-                                if (puts.containsKey(Constants.TABLE_TIME_CONSUME)) {
+                                if (puts.containsKey(Constants.TABLE_TIME_CONSUME)) {//time_consume这个key存在
                                     tracePuts.addAll(puts.get(Constants.TABLE_TIME_CONSUME));
                                 }
-                                if (puts.containsKey(Constants.TABLE_ANNOTATION)) {
+                                if (puts.containsKey(Constants.TABLE_ANNOTATION)) {//annotation这个key存在
                                     annotationPuts.addAll(puts.get(Constants.TABLE_ANNOTATION));
                                 }
                             }
@@ -128,7 +128,7 @@ public class RpcTraceTask implements Task {
                         }
                     }
 
-                    // 存储入hbase
+                    // 存储入hbase  三个表内存储数据
                     this.storeToHbase(Constants.TABLE_TRACE, spanPuts);
                     this.storeToHbase(Constants.TABLE_TIME_CONSUME, tracePuts);
                     this.storeToHbase(Constants.TABLE_ANNOTATION, annotationPuts);
@@ -155,11 +155,11 @@ public class RpcTraceTask implements Task {
 
     /**
      * 构造ServiceInfo
-     * @param serviceId
+     * @param serviceId 接口_方法组成的字符串
      * @return
      */
     private ServiceInfo buildServiceInfo(String serviceId) {
-        String[] detail = serviceId.split(Constants.UNDER_LINE);
+        String[] detail = serviceId.split(Constants.UNDER_LINE);//_拆分
         if (detail.length == 2) {
             ServiceInfoPK serviceInfoPK = new ServiceInfoPK();
             serviceInfoPK.setIface(detail[0]).setMethod(detail[1]);

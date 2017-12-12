@@ -5,7 +5,7 @@ import com.jthink.skyeye.base.constant.EventType;
 
 /**
  * JThink@JThink
- *
+ * api调用是对事件日志的进一步扩展,因为第三方通过api请求我们的服务,因此我们要知道该api是哪个第三方用户请求的
  * @author JThink
  * @version 0.0.1
  * @desc api调用日志事件

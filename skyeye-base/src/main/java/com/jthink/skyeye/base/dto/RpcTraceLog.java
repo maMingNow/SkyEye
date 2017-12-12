@@ -16,7 +16,7 @@ public class RpcTraceLog {
     // 日志事件类型
     private EventType eventType;
     // 具体的span日志内容
-    private String log;
+    private String log;//是一个span对象的一个json字符串内容
 
     /**
      * 不可主动new

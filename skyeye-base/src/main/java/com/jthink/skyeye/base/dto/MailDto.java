@@ -5,7 +5,7 @@ import java.util.List;
 
 /**
  * JThink@JThink
- *
+ * 表示对邮件的一个封装
  * @author JThink
  * @version 0.0.1
  * @desc
@@ -16,7 +16,7 @@ public class MailDto implements Serializable {
     private static final long serialVersionUID = 7447491327917924454L;
 
     // 附件文件
-    private List<FileDto> files;
+    private List<FileDto> files;//附件内容
     // 主题
     private String subject;
     // 内容

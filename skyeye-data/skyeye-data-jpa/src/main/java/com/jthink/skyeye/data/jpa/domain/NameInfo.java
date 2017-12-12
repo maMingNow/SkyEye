@@ -21,7 +21,7 @@ public class NameInfo {
 
     // 联合主键
     @Id
-    private NameInfoPK nameInfoPK;
+    private NameInfoPK nameInfoPK;//主键表
     // 来自哪个app
     @Column(name = "app")
     private String app;

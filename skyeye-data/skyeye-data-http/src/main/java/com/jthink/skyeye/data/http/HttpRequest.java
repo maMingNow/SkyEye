@@ -51,7 +51,7 @@ public class HttpRequest {
 
     public static final Charset CHARSET_UTF8 = Charset.forName("UTF-8");
 
-    private static PoolingHttpClientConnectionManager cm = null;
+    private static PoolingHttpClientConnectionManager cm = null;//连接池
 
     static {
         LayeredConnectionSocketFactory sslsf = null;

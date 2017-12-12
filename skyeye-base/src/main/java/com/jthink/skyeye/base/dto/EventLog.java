@@ -17,6 +17,7 @@ public class EventLog {
     public static final String MONITOR_STATUS_SUCCESS = "success";
     public static final String MONITOR_STATUS_FAILED = "failed";
 
+    //比如LOGGER.info(EventLog.buildEventLog(EventType.middleware_opt, MiddleWare.HBASE.symbol(), 100, EventLog.MONITOR_STATUS_SUCCESS, "我是mock middle ware成功日志").toString());
     // 日志事件类型
     protected EventType eventType;
     // 日志事件名称，如果是api调用则设置成api，如果是任务调度则设置成appId，如果是第三方系统则设置成第三方对接的名字，如果是中间件请设置成MiddleWare
@@ -36,7 +37,7 @@ public class EventLog {
     }
 
     /**
-     * 创建eventlog
+     * 创建eventlog,用于打印log4j
      * @param eventType
      * @param log
      * @return
@@ -52,8 +53,8 @@ public class EventLog {
     }
 
     /**
-     * 根据一条日志的内容解析出该条日志
-     * @param line
+     * 根据一条日志的内容解析出该条日志类型
+     * @param line 该内容仅是用户在log4j中输出的内容
      * @return
      */
     public static EventType parseEventType(String line) {
@@ -73,7 +74,7 @@ public class EventLog {
 
     /**
      * 根据字符串解析成EventLog
-     * @param line
+     * @param line 该内容仅是用户在log4j中输出的内容
      * @return
      */
     public static EventLog parseEventLog(String line) {

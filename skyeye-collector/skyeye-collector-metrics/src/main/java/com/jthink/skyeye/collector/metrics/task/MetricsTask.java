@@ -31,6 +31,7 @@ import java.util.Map;
  * @version 0.0.1
  * @desc 采集任务，消费采集api name、account name、third name、第三方系统异常、任务调度异常、入新es的索引（for kibana）的消费组
  * @date 2016-11-21 15:33:55
+ * 就是不对正常日志 以及rpc日志处理,剩下的日志都进行处理
  */
 @Component
 public class MetricsTask implements Task {
@@ -69,12 +70,12 @@ public class MetricsTask implements Task {
                         String value = record.value();
                         LogDto logDto = this.getLogDto(value);
                         if (logDto != null) {
-                            String logValue = logDto.getMessageMax();
+                            String logValue = logDto.getMessageMax();//log4j中用户设置的字符内容
                             // 进行map过滤操作，找出EventType为非normal的日志
                             String type = EventLog.parseEventType(logValue).symbol();
-                            if (!type.equals(EventType.normal.symbol())) {
+                            if (!type.equals(EventType.normal.symbol())) {//对非正常的日志,即特殊日志类型的日志进行统计处理
                                 // 进行逻辑处理
-                                if (type.equals(EventType.invoke_interface.symbol())) {
+                                if (type.equals(EventType.invoke_interface.symbol())) {//api比较特别,因为里面含有账户信息
                                     // 如果是api
                                     this.indexer.doJob(ApiLog.parseEventLog(logValue), logDto, bulkRequest);
                                 } else if (!type.equals(EventType.rpc_trace.symbol())) {

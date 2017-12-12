@@ -5,7 +5,7 @@ use `monitor-center`;
 --
 -- table structure for table `app_info`
 --
-
+//表示一个app应用表,包含应用所在的host、应用名字、应用类型、部署在哪个路径下、此时app的状态
 drop table if exists `app_info`;
 create table `app_info` (
   `app` varchar(255) not null,
@@ -31,7 +31,7 @@ CREATE TABLE `name_info` (
 --
 -- Table structure for table `service_info`
 --
-
+//表示一个服务,一个服务是由一个服务接口以及该接口下一个方法提供的,为每一个方法分配一个唯一的ID
 DROP TABLE IF EXISTS `service_info`;
 CREATE TABLE `service_info` (
   `iface` varchar(255) NOT NULL,

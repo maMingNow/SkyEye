@@ -20,13 +20,13 @@ import javax.persistence.Table;
 public class AppInfo {
 
     @Id
-    private AppInfoPK appInfoPK;
+    private AppInfoPK appInfoPK;//app主键表
 
     @Column(name = "status")
-    private String status;
+    private String status;//app的状态
 
     @Column(name = "deploy", nullable = false)
-    private String deploy;
+    private String deploy;//app部署在哪里
 
     public AppInfoPK getAppInfoPK() {
         return appInfoPK;
