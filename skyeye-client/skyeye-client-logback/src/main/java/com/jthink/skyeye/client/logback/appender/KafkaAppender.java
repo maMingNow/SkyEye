@@ -82,7 +82,7 @@ public class KafkaAppender<E> extends UnsynchronizedAppenderBase<E>  {
         // 设置分区类, 使用自定义的KeyModPartitioner，同样的key进入相同的partition
         this.checkAndSetConfig(ProducerConfig.PARTITIONER_CLASS_CONFIG, KeyModPartitioner.class.getName());
 
-        shutdownHook = new DelayingShutdownHook();
+        shutdownHook = new DelayingShutdownHook();//hook是logback提供的,当使用kill 不是-9的时候就会执行stop方法
     }
 
     @Override

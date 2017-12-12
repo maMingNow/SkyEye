@@ -93,7 +93,7 @@ public class ZkRegister {
         ///skyeye/monitor/query
         this.getClient().writeData(Constants.ROOT_PATH_PERSISTENT + Constants.SLASH + app + Constants.SLASH + host,
                 mail + Constants.SEMICOLON + SysUtil.userDir);//在/app/host下面写入数据 mail:项目路径
-        // 注册临时节点用于日志滚屏
+        // 注册临时节点用于日志滚屏  以及 系统上下线报警
         ///skyeye/monitor/scroll
         this.getClient().createPersistent(Constants.ROOT_PATH_EPHEMERAL + Constants.SLASH + app, true);//app是永久节点,但是下面的host是临时节点.因此可以知道谁还在活着
         this.create(Constants.SLASH + app + Constants.SLASH + host, NodeMode.EPHEMERAL,
