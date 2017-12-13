@@ -64,7 +64,9 @@ public class KafkaAppender<E> extends UnsynchronizedAppenderBase<E>  {
     private ZkRegister zkRegister;
     // hook
     private DelayingShutdownHook shutdownHook;
+
     // kafkaAppender遇到异常需要向zk进行写入数据，由于onCompletion()的调用在kafka集群完全挂掉时会有很多阻塞的日志会调用，所以我们需要保证只向zk写一次数据，监控中心只会发生一次报警
+    //防止频繁更改zookeeper上的data更改事件,因此有一个flag多线程安全的方式
     private volatile AtomicBoolean flag = new AtomicBoolean(true);
     // 心跳检测
     private Timer timer;

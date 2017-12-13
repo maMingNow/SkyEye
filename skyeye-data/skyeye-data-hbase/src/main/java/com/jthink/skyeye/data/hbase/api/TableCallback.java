@@ -15,6 +15,7 @@ import org.apache.hadoop.hbase.client.Table;
  * @version 0.0.1
  * @desc copy from spring data hadoop hbase, modified by JThink, use the 1.0.0 api
  * @date 2016-11-15 14:49:52
+ * 该接口用于操作hbase的table表对象
  */
 public interface TableCallback<T> {
 
@@ -24,6 +25,7 @@ public interface TableCallback<T> {
      * @param table active Hbase table
      * @return a result object, or null if none
      * @throws Throwable thrown by the Hbase API
+     * 针对一个hbase的table进行操作,返回一个值
      */
     T doInTable(Table table) throws Throwable;
 }

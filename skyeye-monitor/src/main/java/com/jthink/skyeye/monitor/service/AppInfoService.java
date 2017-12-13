@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
  * @version 0.0.1
  * @desc
  * @date 2016-10-09 11:09:01
+ * 对mysql关于app数据库的增删改查操作
  */
 @Service
 public class AppInfoService {
@@ -23,7 +24,7 @@ public class AppInfoService {
     @Autowired
     private ZkClient zkClient;
     @Autowired
-    private AppInfoRepository appInfoRepository;
+    private AppInfoRepository appInfoRepository;//操作数据库的对象
 
     /**
      * 保存appInfo
@@ -37,12 +38,12 @@ public class AppInfoService {
         AppInfoPK appInfoPK = new AppInfoPK(host, app, type);
         appInfo.setAppInfoPK(appInfoPK);
         appInfo.setStatus(logCollectionStatus.symbol());
-        if (logCollectionStatus.symbol().equals(LogCollectionStatus.HISTORY.symbol())) {
+        if (logCollectionStatus.symbol().equals(LogCollectionStatus.HISTORY.symbol())) {//获取部署的位置
             appInfo.setDeploy(this.getDeploy(Constants.ROOT_PATH_PERSISTENT + Constants.SLASH + app + Constants.SLASH + host));
         } else {
             appInfo.setDeploy(this.getDeploy(Constants.ROOT_PATH_EPHEMERAL + Constants.SLASH + app + Constants.SLASH + host));
         }
-        this.appInfoRepository.save(appInfo);
+        this.appInfoRepository.save(appInfo);//要么更新 或者 insert
     }
 
     /**

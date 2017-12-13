@@ -25,6 +25,7 @@ public class GenerateLog {
     @Autowired
     private GenerateLogService generateLogService;
 
+    //定时任务,不断的调用该方法
     @Scheduled(cron = "* * * * * *")
     public void refreshCache() {
 //        LOGGER.info("reload cache start");

@@ -46,18 +46,18 @@ public class CacheService implements InitializingBean {
 
         // 启动时获取所有的节点数据, 写入本地缓存和mysql
         for (String app : apps) {
-            List<String> hosts = curatorFramework.getChildren().forPath(Constants.ROOT_PATH_EPHEMERAL + Constants.SLASH + app);
+            List<String> hosts = curatorFramework.getChildren().forPath(Constants.ROOT_PATH_EPHEMERAL + Constants.SLASH + app);///skyeye/monitor/scroll/app  获取该app下所有的host
             for (String host : hosts) {
                 appHosts.add(Constants.ROOT_PATH_EPHEMERAL + Constants.SLASH + app + Constants.SLASH + host);
-                this.appInfoService.add(host, app, Constants.ZK_NODE_TYPE_EPHEMERAL, this.calLogCollectionStatus(app, host));
+                this.appInfoService.add(host, app, Constants.ZK_NODE_TYPE_EPHEMERAL, this.calLogCollectionStatus(app, host));//设置当前状态
             }
         }
 
-        apps = curatorFramework.getChildren().forPath(Constants.ROOT_PATH_PERSISTENT);
+        apps = curatorFramework.getChildren().forPath(Constants.ROOT_PATH_PERSISTENT); ///skyeye/monitor/query 下面所有的app
         for (String app : apps) {
             List<String> hosts = curatorFramework.getChildren().forPath(Constants.ROOT_PATH_PERSISTENT + Constants.SLASH + app);
             for (String host : hosts) {
-                this.appInfoService.add(host, app, Constants.ZK_NODE_TYPE_PERSISTENT, LogCollectionStatus.HISTORY);
+                this.appInfoService.add(host, app, Constants.ZK_NODE_TYPE_PERSISTENT, LogCollectionStatus.HISTORY);//设置状态是历史状态
             }
         }
 
@@ -74,7 +74,7 @@ public class CacheService implements InitializingBean {
      */
     private LogCollectionStatus calLogCollectionStatus(String app, String host) {
         String[] datas = this.zkClient.readData(Constants.ROOT_PATH_EPHEMERAL + Constants.SLASH + app + Constants.SLASH + host).toString().split(Constants.SEMICOLON);
-        if (datas[0].equals(Constants.APPENDER_INIT_DATA) || datas[0].equals(Constants.APP_APPENDER_RESTART_KEY)) {
+        if (datas[0].equals(Constants.APPENDER_INIT_DATA) || datas[0].equals(Constants.APP_APPENDER_RESTART_KEY)) {//说明此时状态是运行中
             return LogCollectionStatus.RUNNING;
         }
         return LogCollectionStatus.STOPPED;

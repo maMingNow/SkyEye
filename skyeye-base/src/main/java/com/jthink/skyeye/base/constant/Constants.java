@@ -131,7 +131,7 @@ public class Constants {
     public static final String WECHAT_ALERT_DEPOLY = "位置: ";
     public static final String WECHAT_ALERT_TIME = "时间: ";
     public static final String WECHAT_ALERT_MSG = "详情: ";
-    public static final String APP_START = "start";
+    public static final String APP_START = "start";//说明新增了一个app
     public static final String APP_STOP = "stop";
     public static final String APP_APPENDER_RESTART_KEY = "restart";//kafka重新连接成功
     public static final String APP_APPENDER_RESTART = "kafka appender restart";

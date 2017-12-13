@@ -39,9 +39,9 @@ public class HbaseTemplate implements HbaseOperations {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(HbaseTemplate.class);
 
-    private Configuration configuration;
+    private Configuration configuration;//hadoop的配置对象
 
-    private volatile Connection connection;
+    private volatile Connection connection;//hbase的一个连接
 
     public HbaseTemplate(Configuration configuration) {
         this.setConfiguration(configuration);
@@ -54,13 +54,13 @@ public class HbaseTemplate implements HbaseOperations {
         Assert.notNull(action, "Callback object must not be null");
         Assert.notNull(tableName, "No table specified");
 
-        StopWatch sw = new StopWatch();
+        StopWatch sw = new StopWatch();//开始计时
         sw.start();
         String status = EventLog.MONITOR_STATUS_SUCCESS;
         Table table = null;
         try {
-            table = this.getConnection().getTable(TableName.valueOf(tableName));
-            return action.doInTable(table);
+            table = this.getConnection().getTable(TableName.valueOf(tableName));//返回一个hbase的表对象
+            return action.doInTable(table);//对该表进行操作
         } catch (Throwable throwable) {
             status = EventLog.MONITOR_STATUS_FAILED;//执行失败
             throw new HbaseSystemException(throwable);
@@ -70,6 +70,7 @@ public class HbaseTemplate implements HbaseOperations {
                     table.close();
                     sw.stop();
                     LOGGER.info(EventLog.buildEventLog(EventType.middleware_opt, MiddleWare.HBASE.symbol(), sw.getTotalTimeMillis(), status, "hbase请求").toString());
+                    //此时打印一个中间件日志
                 } catch (IOException e) {
                     LOGGER.error("hbase资源释放失败");
                 }
@@ -81,7 +82,7 @@ public class HbaseTemplate implements HbaseOperations {
     public <T> List<T> find(String tableName, String family, final RowMapper<T> action) {
         Scan scan = new Scan();
         scan.setCaching(5000);
-        scan.addFamily(Bytes.toBytes(family));
+        scan.addFamily(Bytes.toBytes(family));//记录查询哪些family
         return this.find(tableName, scan, action);
     }
 
@@ -89,13 +90,14 @@ public class HbaseTemplate implements HbaseOperations {
     public <T> List<T> find(String tableName, String family, String qualifier, final RowMapper<T> action) {
         Scan scan = new Scan();
         scan.setCaching(5000);
-        scan.addColumn(Bytes.toBytes(family), Bytes.toBytes(qualifier));
+        scan.addColumn(Bytes.toBytes(family), Bytes.toBytes(qualifier));//对hbase要过滤的列进行过滤
         return this.find(tableName, scan, action);
     }
 
+    //查询一个List结果
     @Override
     public <T> List<T> find(String tableName, final Scan scan, final RowMapper<T> action) {
-        return this.execute(tableName, new TableCallback<List<T>>() {
+        return this.execute(tableName, new TableCallback<List<T>>() {//返回值处理成一个List
             @Override
             public List<T> doInTable(Table table) throws Throwable {
                 int caching = scan.getCaching();
@@ -103,12 +105,12 @@ public class HbaseTemplate implements HbaseOperations {
                 if (caching == 1) {
                     scan.setCaching(5000);
                 }
-                ResultScanner scanner = table.getScanner(scan);
+                ResultScanner scanner = table.getScanner(scan);//对表进行scan处理
                 try {
                     List<T> rs = new ArrayList<T>();
                     int rowNum = 0;
-                    for (Result result : scanner) {
-                        rs.add(action.mapRow(result, rowNum++));
+                    for (Result result : scanner) {//循环每一个结果集
+                        rs.add(action.mapRow(result, rowNum++));//对每一个结果进行封装
                     }
                     return rs;
                 } finally {
@@ -118,6 +120,7 @@ public class HbaseTemplate implements HbaseOperations {
         });
     }
 
+    //查询一行数据
     @Override
     public <T> T get(String tableName, String rowName, final RowMapper<T> mapper) {
         return this.get(tableName, rowName, null, null, mapper);
@@ -128,6 +131,11 @@ public class HbaseTemplate implements HbaseOperations {
         return this.get(tableName, rowName, familyName, null, mapper);
     }
 
+    /**
+     * @param tableName
+     * @param rowName 属于rowkey
+     * @param mapper 如何解析该行数据
+     */
     @Override
     public <T> T get(String tableName, final String rowName, final String familyName, final String qualifier, final RowMapper<T> mapper) {
         return this.execute(tableName, new TableCallback<T>() {
@@ -149,6 +157,7 @@ public class HbaseTemplate implements HbaseOperations {
         });
     }
 
+    //对一行数据进行增删改查操作
     @Override
     public void execute(String tableName, MutatorCallback action) {
         Assert.notNull(action, "Callback object must not be null");
@@ -160,8 +169,8 @@ public class HbaseTemplate implements HbaseOperations {
         BufferedMutator mutator = null;
         try {
             BufferedMutatorParams mutatorParams = new BufferedMutatorParams(TableName.valueOf(tableName));
-            mutator = this.getConnection().getBufferedMutator(mutatorParams.writeBufferSize(3 * 1024 * 1024));
-            action.doInMutator(mutator);
+            mutator = this.getConnection().getBufferedMutator(mutatorParams.writeBufferSize(3 * 1024 * 1024));//创建该表的一个缓冲通道
+            action.doInMutator(mutator);//缓冲通道作用于action,让action进行具体的处理
         } catch (Throwable throwable) {
             status = EventLog.MONITOR_STATUS_FAILED;
             throw new HbaseSystemException(throwable);
@@ -171,7 +180,7 @@ public class HbaseTemplate implements HbaseOperations {
                     mutator.flush();
                     mutator.close();
                     sw.stop();
-                    LOGGER.info(EventLog.buildEventLog(EventType.middleware_opt, MiddleWare.HBASE.symbol(), sw.getTotalTimeMillis(), status, "hbase请求").toString());
+                    LOGGER.info(EventLog.buildEventLog(EventType.middleware_opt, MiddleWare.HBASE.symbol(), sw.getTotalTimeMillis(), status, "hbase请求").toString());//记录埋点日志
                 } catch (IOException e) {
                     LOGGER.error("hbase mutator资源释放失败");
                 }
@@ -179,12 +188,13 @@ public class HbaseTemplate implements HbaseOperations {
         }
     }
 
+    //参数是要更改的一条数据
     @Override
     public void saveOrUpdate(String tableName, final Mutation mutation) {
         this.execute(tableName, new MutatorCallback() {
             @Override
             public void doInMutator(BufferedMutator mutator) throws Throwable {
-                mutator.mutate(mutation);
+                mutator.mutate(mutation);//action持有缓冲通道mutator,在缓冲通道mutator里面进行mutation处理
             }
         });
     }

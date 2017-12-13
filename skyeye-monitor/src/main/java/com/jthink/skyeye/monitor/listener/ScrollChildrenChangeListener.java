@@ -34,16 +34,17 @@ public class ScrollChildrenChangeListener implements PathChildrenCacheListener  
         this.appInfoService = appInfoService;
     }
 
+    //先监听/skyeye/monitor/scroll节点,因为新增节点都是先进入这个节点的,因此先对他进行监听,比如先部署一个项目
     @Override
     public void childEvent(CuratorFramework client, PathChildrenCacheEvent event) throws Exception {
         switch (event.getType()) {
-            case CHILD_ADDED:
+            case CHILD_ADDED://比如新加入一个app
                 PathChildrenCache pathChildrenCache = new PathChildrenCache(client, event.getData().getPath(), true);
                 pathChildrenCache.start(PathChildrenCache.StartMode.POST_INITIALIZED_EVENT);
-                pathChildrenCache.getListenable().addListener(new AppChildrenChangeListener(this.rabbitmqService, this.zkClient, this.appInfoService));
+                pathChildrenCache.getListenable().addListener(new AppChildrenChangeListener(this.rabbitmqService, this.zkClient, this.appInfoService));//为新增的app节点增加一个监听
                 LOGGER.info("app added: " + event.getData().getPath());
                 break;
-            case CHILD_REMOVED:
+            case CHILD_REMOVED://理论上这段应该不会出现的,因为app节点本身是一个永久的节点
                 LOGGER.info("app removed: " + event.getData().getPath());
                 break;
         }

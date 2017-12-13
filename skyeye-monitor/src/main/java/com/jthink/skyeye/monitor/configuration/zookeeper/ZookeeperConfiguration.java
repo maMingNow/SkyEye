@@ -12,6 +12,10 @@ import org.springframework.context.annotation.Configuration;
 /**
  * JThink@JThink
  *
+ * CuratorFramework 框架很方便做watch
+   ZkClient 框架很方便做读取get和put操作
+   因此都使用了
+
  * @author JThink
  * @version 0.0.1
  * @desc zk的配置

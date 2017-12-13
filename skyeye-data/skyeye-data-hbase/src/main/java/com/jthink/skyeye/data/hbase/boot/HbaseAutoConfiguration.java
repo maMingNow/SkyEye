@@ -22,9 +22,9 @@ import org.springframework.context.annotation.Bean;
 @ConditionalOnClass(HbaseTemplate.class)
 public class HbaseAutoConfiguration {
 
-    private static final String HBASE_QUORUM = "hbase.zookeeper.quorum";
-    private static final String HBASE_ROOTDIR = "hbase.rootdir";
-    private static final String HBASE_ZNODE_PARENT = "zookeeper.znode.parent";
+    private static final String HBASE_QUORUM = "hbase.zookeeper.quorum";//zookeeper的服务器
+    private static final String HBASE_ROOTDIR = "hbase.rootdir";//hbase在hdfs上的根目录
+    private static final String HBASE_ZNODE_PARENT = "zookeeper.znode.parent";//zookeeper在hbase的根目录
 
 
     @Autowired

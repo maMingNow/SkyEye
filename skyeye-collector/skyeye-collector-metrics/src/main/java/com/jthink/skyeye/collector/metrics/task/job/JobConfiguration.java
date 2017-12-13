@@ -36,6 +36,8 @@ public class JobConfiguration {
     private TransportClient transportClient;
 
     // 以下3个bean进行责任链的生成和组装
+
+    //主要用于发生失败的情况时候如何报警
     @Bean
     public ExceptionProcessor exceptionProcessor() {
         List<EventType> exceptionProcesses = Arrays.asList(EventType.job_execute, EventType.thirdparty_call, EventType.middleware_opt, EventType.invoke_interface);
@@ -45,6 +47,7 @@ public class JobConfiguration {
         return exceptionProcessor;
     }
 
+    //负责处理第三方和api的统计信息
     @Bean
     public NameCollector nameCollector(ExceptionProcessor exceptionProcessor) {
         List<EventType> names = Arrays.asList(EventType.invoke_interface, EventType.thirdparty_call);
@@ -54,6 +57,7 @@ public class JobConfiguration {
         return nameCollector;
     }
 
+    //做es用于查询每一个事件对应的信息
     @Bean
     public Indexer indexer(NameCollector nameCollector) {
         List<EventType> indexes = Arrays.asList(EventType.job_execute, EventType.thirdparty_call, EventType.middleware_opt, EventType.invoke_interface);

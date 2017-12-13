@@ -31,7 +31,8 @@ public class AppStatusMonitorService {
     private AppInfoService appInfoService;
 
     public void init() throws Exception {
-        PathChildrenCache pathChildrenCache = new PathChildrenCache(curatorFramework, Constants.ROOT_PATH_EPHEMERAL, true);
+        //先监听/skyeye/monitor/scroll节点,因为新增节点都是先进入这个节点的,因此先对他进行监听,比如先部署一个项目
+        PathChildrenCache pathChildrenCache = new PathChildrenCache(curatorFramework, Constants.ROOT_PATH_EPHEMERAL, true);//对/skyeye/monitor/scroll进行监控
         pathChildrenCache.start(PathChildrenCache.StartMode.POST_INITIALIZED_EVENT);
         pathChildrenCache.getListenable().addListener(new ScrollChildrenChangeListener(this.rabbitmqService, this.zkClient, this.appInfoService));
     }

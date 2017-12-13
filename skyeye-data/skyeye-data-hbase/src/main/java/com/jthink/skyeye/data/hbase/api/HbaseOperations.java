@@ -19,6 +19,7 @@ import java.util.List;
  * @version 0.0.1
  * @desc copy from spring data hadoop hbase, modified by JThink, remove the unuse interface
  * @date 2016-11-15 14:49:52
+ * 定义一个操作,用户需要自己实现,这样实现后,在HbaseTemplate中就可以进行拦截了,打印各种埋点日志
  */
 public interface HbaseOperations {
 

@@ -42,6 +42,7 @@ public class AppChildrenChangeListener implements PathChildrenCacheListener {
         this.appInfoService = appInfoService;
     }
 
+    //监听一个app的变化----对/skyeye/monitor/scroll/app进行监控
     @Override
     public void childEvent(CuratorFramework client, PathChildrenCacheEvent event) throws Exception {
         String node = Constants.EMPTY_STR;
@@ -50,63 +51,64 @@ public class AppChildrenChangeListener implements PathChildrenCacheListener {
         String info = Constants.EMPTY_STR;
         String[] datas = null;
         switch (event.getType()) {
-            case CHILD_ADDED:
-                node = event.getData().getPath();
+            case CHILD_ADDED://说明增加了一个host
+                node = event.getData().getPath();//具体的路径 /skyeye/monitor/scroll/app/host
                 app = this.getApp(node);
                 host = this.getHost(node);
-                if (!CacheService.appHosts.contains(node)) {
-                    datas = this.zkClient.readData(Constants.ROOT_PATH_PERSISTENT + Constants.SLASH + app + Constants.SLASH + host).toString().split(Constants.SEMICOLON);
+                if (!CacheService.appHosts.contains(node)) {//说明该host是第一次加入
+                    datas = this.zkClient.readData(Constants.ROOT_PATH_PERSISTENT + Constants.SLASH + app + Constants.SLASH + host).toString().split(Constants.SEMICOLON); //获取/skyeye/monitor/query/app/host下面的数据
 
                     info = this.buildMsg(DateUtil.format(new Date(System.currentTimeMillis()), DateUtil.YYYYMMDDHHMMSS), app,
                             this.getHost(node), datas[1], Constants.APP_START);
 
                     // add to the queue
-                    this.rabbitmqService.sendMessage(info, datas[0]);
+                    this.rabbitmqService.sendMessage(info, datas[0]);//发送信息,说明新增了一个app,datas[0]是邮箱地址
                     LOGGER.info(info);
-                    CacheService.appHosts.add(node);
-                    this.appInfoService.add(host, app, Constants.ZK_NODE_TYPE_EPHEMERAL, this.calLogCollectionStatus(app, host));
+                    CacheService.appHosts.add(node);//添加一个该host节点进入缓存
+                    this.appInfoService.add(host, app, Constants.ZK_NODE_TYPE_EPHEMERAL, this.calLogCollectionStatus(app, host));//存储mysql一个临时节点,说明该app现在还活着
                 }
-                this.appInfoService.add(host, app, Constants.ZK_NODE_TYPE_PERSISTENT, LogCollectionStatus.HISTORY);
+                this.appInfoService.add(host, app, Constants.ZK_NODE_TYPE_PERSISTENT, LogCollectionStatus.HISTORY);//存储一个永久节点,即该app曾经部署成功过
                 break;
-            case CHILD_REMOVED:
+            case CHILD_REMOVED://说明一个host下线了
                 node = event.getData().getPath();
                 app = this.getApp(node);
                 host = this.getHost(node);
                 datas = this.zkClient.readData(Constants.ROOT_PATH_PERSISTENT + Constants.SLASH + app + Constants.SLASH + host).toString().split(Constants.SEMICOLON);
 
                 info = this.buildMsg(DateUtil.format(new Date(System.currentTimeMillis()), DateUtil.YYYYMMDDHHMMSS), app,
-                        this.getHost(node), datas[1], Constants.APP_STOP);
+                        this.getHost(node), datas[1], Constants.APP_STOP);//设置该app下线了
 
                 // add to the queue
                 this.rabbitmqService.sendMessage(info, datas[0]);
                 LOGGER.info(info);
                 if (CacheService.appHosts.contains(node)) {
                     CacheService.appHosts.remove(node);
-                    this.appInfoService.delete(host, app, Constants.ZK_NODE_TYPE_EPHEMERAL);
+                    this.appInfoService.delete(host, app, Constants.ZK_NODE_TYPE_EPHEMERAL);//在存储中删除该临时节点
                 }
                 break;
-            case CHILD_UPDATED:
+            case CHILD_UPDATED://说明一个host有变化
                 node = event.getData().getPath();
                 datas = this.zkClient.readData(node).toString().split(Constants.SEMICOLON);
                 app = this.getApp(node);
                 host = this.getHost(node);
 
-                String detail = Constants.APP_APPENDER_STOP;
+                String detail = Constants.APP_APPENDER_STOP;//默认是该节点的kafka有问题了,暂时客户端失败了
                 LogCollectionStatus status = LogCollectionStatus.STOPPED;
 
-                if (datas[0].equals(Constants.APP_APPENDER_RESTART_KEY)) {
+                if (datas[0].equals(Constants.APP_APPENDER_RESTART_KEY)) {//说明该节点的kafka已经好了,客户端已经恢复正常
                     // 如果是kafka appender restart
                     detail = Constants.APP_APPENDER_RESTART;
                     status = LogCollectionStatus.RUNNING;
                 }
 
+                //构建一个信息
                 info = this.buildMsg(DateUtil.format(new Date(Long.parseLong(datas[1])), DateUtil.YYYYMMDDHHMMSS), app,
                         this.getHost(node), datas[2], detail);
 
                 // add to the queue
                 this.rabbitmqService.sendMessage(info, this.zkClient.readData(Constants.ROOT_PATH_PERSISTENT + Constants.SLASH + app + Constants.SLASH + host).toString().split(Constants.SEMICOLON)[0]);
                 LOGGER.info(info);
-                this.appInfoService.update(host, app, Constants.ZK_NODE_TYPE_EPHEMERAL, status);
+                this.appInfoService.update(host, app, Constants.ZK_NODE_TYPE_EPHEMERAL, status);//更新app在host上的新的状态
                 break;
         }
     }
@@ -157,7 +159,7 @@ public class AppChildrenChangeListener implements PathChildrenCacheListener {
      * 根据app和host计算LogCollectionStatus
      * @param app
      * @param host
-     * @return
+     * @return 查看该app是否还运行中
      */
     public LogCollectionStatus calLogCollectionStatus(String app, String host) {
         String[] datas = this.zkClient.readData(Constants.ROOT_PATH_EPHEMERAL + Constants.SLASH + app + Constants.SLASH + host).toString().split(Constants.SEMICOLON);

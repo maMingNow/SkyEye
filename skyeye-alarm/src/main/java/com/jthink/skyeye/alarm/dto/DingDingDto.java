@@ -12,9 +12,9 @@ public class DingDingDto {
 
     private String msgtype = "text";
 
-    private Text text;
+    private Text text;//叮叮的信息内容
 
-    private At at;
+    private At at;//是否@人
 
     public String getMsgtype() {
         return msgtype;
@@ -43,6 +43,7 @@ public class DingDingDto {
         return this;
     }
 
+    //叮叮内容
     public static class Text {
         private String content;
 
@@ -63,6 +64,7 @@ public class DingDingDto {
         }
     }
 
+    //是否@全体人员
     public static class At {
         private Boolean isAtAll;
 
