@@ -108,7 +108,7 @@ public class ZkRegister {
      */
     public void registerRpc(String host, String app, String rpc) {
         if (!rpc.equals(RpcType.none.symbol())) {
-            RegisterDto dto = new RegisterDto(app, host, this.client);
+            RegisterDto dto = new RegisterDto(app, host, this.client);//向注册中心注册的信息dto---表示一个app在一个host上启动了,并且向zookeeper报告一下该节点是一个rpc服务的app
             Registry registry = new ZookeeperRegistry();
             IncrementIdGen.setId(registry.register(dto));
         }

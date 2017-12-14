@@ -11,7 +11,7 @@ package com.jthink.skyeye.trace.core.sampler;
 public interface Sampler {
 
     /**
-     * 是否采集
+     * 是否采集--true表示要采样,false表示不采样该数据
      * @return
      */
     boolean isCollect();

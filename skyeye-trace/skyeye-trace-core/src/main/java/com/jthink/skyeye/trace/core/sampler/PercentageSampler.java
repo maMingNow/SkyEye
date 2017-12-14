@@ -8,6 +8,7 @@ import java.util.concurrent.atomic.AtomicLong;
  * @author JThink
  * @version 0.0.1
  * @desc 百分比采样率实现
+ * 属于阶梯采样
  * 0-100条/s: 全部采集
  * 101-500条/s: 50%采集
  * 501条以上/s: 10%采集
@@ -15,29 +16,31 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 public class PercentageSampler implements Sampler {
 
-    private AtomicLong count = new AtomicLong();
+    private AtomicLong count = new AtomicLong();//一秒内一共产生了多少条数据了
     private int levelOne = 100;
     private int levelTwo = 500;
     private Long lastTime = -1L;
 
+    //是否采集--true表示要采样,false表示不采样该数据
     @Override
     public boolean isCollect() {
-        boolean isSample = true;
-        long n = count.incrementAndGet();
-        if (System.currentTimeMillis() - lastTime  < 1000) {
-            if (n > levelOne && n <= levelTwo) {
-                n = n % 2;
+        boolean isSample = true;//默认是要采样的
+        long n = count.incrementAndGet();//先获取该秒内有多少条数据了
+        if (System.currentTimeMillis() - lastTime  < 1000) {//1000表示1秒,即当前时间还是在一秒内
+            if (n > levelOne && n <= levelTwo) {//说明是符合101-500条/s条件,因此按照50%采集
+                n = n % 2;//直接去模即可
                 if (n != 0) {
                     isSample = false;
                 }
             }
-            if (n > levelTwo) {
+            if (n > levelTwo) {//符合501条以上/s: 10%采集条件
                 n = n % 10;
                 if (n != 0) {
                     isSample = false;
                 }
             }
-        } else {
+            //默认是true,表示1秒内产生了100条以内的数据,都采集
+        } else {//说明超过一秒内了,重新计算
             count.getAndSet(0);
             lastTime = System.currentTimeMillis();
         }

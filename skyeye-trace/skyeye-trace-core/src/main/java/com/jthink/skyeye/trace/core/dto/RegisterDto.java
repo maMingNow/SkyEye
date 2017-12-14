@@ -7,7 +7,7 @@ import org.I0Itec.zkclient.ZkClient;
  *
  * @author JThink
  * @version 0.0.1
- * @desc 向注册中心注册的信息dto
+ * @desc 向注册中心注册的信息dto---表示一个app在一个host上启动了,并且向zookeeper报告一下该节点是一个rpc服务的app
  * @date 2017-03-23 11:04:16
  */
 public class RegisterDto {

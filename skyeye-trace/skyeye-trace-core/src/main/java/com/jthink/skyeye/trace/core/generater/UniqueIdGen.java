@@ -7,6 +7,7 @@ package com.jthink.skyeye.trace.core.generater;
  * @version 0.0.1
  * @desc 分布式唯一ID生成器，用来生成traceID和spanID
  * @date 2017-03-24 11:25:31
+ * 规则是若干年的时间戳 + app的workerid + 每毫秒内产生的序列号
  */
 public class UniqueIdGen implements IdGen {
 
@@ -21,9 +22,9 @@ public class UniqueIdGen implements IdGen {
     private final static int SEQUENCE_BITS = 10;
 
     // 最大的app host id，8091
-    private final static long MAX_APP_HOST_ID = ~(-1L << APP_HOST_ID_BITS);
+    private final static long MAX_APP_HOST_ID = ~(-1L << APP_HOST_ID_BITS); //最多允许多少个
     // 最大的序列号，1023
-    private final static long MAX_SEQUENCE = ~(-1L << SEQUENCE_BITS);
+    private final static long MAX_SEQUENCE = ~(-1L << SEQUENCE_BITS);//最多允许多少个
 
     // app host编号的移位
     private final static long APP_HOST_ID_SHIFT = SEQUENCE_BITS;
@@ -35,14 +36,14 @@ public class UniqueIdGen implements IdGen {
     // 上次生成ID的时间戳
     private long lastTimestamp = -1L;
     // 当前毫秒生成的序列
-    private long sequence = 0L;
+    private long sequence = 0L;//每秒从0开始计数
 
     // 单例
     private static volatile UniqueIdGen idGen = null;
 
     /**
      * 实例化
-     * @param appHostId
+     * @param appHostId 分配的workerid
      * @return
      */
     public static UniqueIdGen getInstance(long appHostId) {
@@ -80,12 +81,13 @@ public class UniqueIdGen implements IdGen {
     private synchronized long genUniqueId() {
         long current = System.currentTimeMillis();
 
-        if (current < lastTimestamp) {
+        if (current < lastTimestamp) {//基本不可能发生这种,除非始终回拨,因为现在的时间一定比lastTimestamp要大
             // 如果当前时间小于上一次ID生成的时间戳，说明系统时钟回退过，出现问题返回-1
             return -1;
         }
 
-        if (current == lastTimestamp) {
+        //设置统一毫秒内的sequence序号
+        if (current == lastTimestamp) {//说明在相同的时间内有若干个id要生成
             // 如果当前生成id的时间还是上次的时间，那么对sequence序列号进行+1
             sequence = (sequence + 1) & MAX_SEQUENCE;
 
@@ -102,6 +104,7 @@ public class UniqueIdGen implements IdGen {
         lastTimestamp = current;
 
         // 进行移位操作生成int64的唯一ID
+        //规则是若干年的时间戳 + app的workerid + 每毫秒内产生的序列号
         return ((current - START_TIME) << TIMESTAMP_LEFT_SHIFT)
                 | (this.appHostId << APP_HOST_ID_SHIFT)
                 | sequence;

@@ -15,6 +15,7 @@ public interface Registry {
     /**
      * 对服务进行注册
      * @return 返回注册serviceID
+     * 每一个服务只能开启一个唯一的ID,全局共享,该唯一ID是在该节点上用于生成分布式上的唯一的ID
      */
     String register(RegisterDto registerDto);
 }

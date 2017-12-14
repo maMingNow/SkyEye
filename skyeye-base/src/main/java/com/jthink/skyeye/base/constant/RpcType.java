@@ -10,6 +10,7 @@ package com.jthink.skyeye.base.constant;
  */
 public enum RpcType {
 
+    //三种rpc的实现,其中none表示不是rpc项目
     none(Constants.RPC_TYPE_NONE, "none"),
     dubbo(Constants.RPC_TYPE_DUBBO, "dubbo"),
     sc(Constants.RPC_TYPE_SC, "spring-cloud");

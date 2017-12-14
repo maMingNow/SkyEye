@@ -28,10 +28,10 @@ public class ZookeeperRegistry implements Registry {
 
         // 向注册中心注册
         ZkClient zkClient = registerDto.getZkClient();
-        zkClient.createPersistent(Constants.ZK_REGISTRY_SERVICE_ROOT_PATH + Constants.SLASH + app, true);
+        zkClient.createPersistent(Constants.ZK_REGISTRY_SERVICE_ROOT_PATH + Constants.SLASH + app, true);//创建/skyeye/registry/service/app这个永久节点
         IdGen idGen = new IncrementIdGen(registerDto);
-        String id = idGen.nextId();
-        zkClient.createEphemeral(Constants.ZK_REGISTRY_SERVICE_ROOT_PATH + Constants.SLASH + app + Constants.SLASH + host, id);
+        String id = idGen.nextId();//为该app/host分配一个id
+        zkClient.createEphemeral(Constants.ZK_REGISTRY_SERVICE_ROOT_PATH + Constants.SLASH + app + Constants.SLASH + host, id);//创建 /skyeye/registry/service/app/host临时节点,上面存储这workerid
 
         return id;
     }

@@ -206,9 +206,9 @@ public class Constants {
     public static final String LOG_LEVEL_WARNING = "WARNING";
 
     // rpc 服务注册中心相关
-    public static final String ZK_REGISTRY_SERVICE_ROOT_PATH = "/skyeye/registry/service";
-    public static final String ZK_REGISTRY_ID_ROOT_PATH = "/skyeye/registry/id";
-    public static final String ZK_REGISTRY_SEQ = "/skyeye/seq";
+    public static final String ZK_REGISTRY_SERVICE_ROOT_PATH = "/skyeye/registry/service";//表示提供服务的app集合,下面可以看到每一个host上此时有哪些workerid正在运行中
+    public static final String ZK_REGISTRY_ID_ROOT_PATH = "/skyeye/registry/id";//用于存储每一个app/host对应分配给他的workerid
+    public static final String ZK_REGISTRY_SEQ = "/skyeye/seq";//用于产生一个自增长的ID
 
     public static final String RPC_TYPE_NONE = "none";
     public static final String RPC_TYPE_DUBBO = "dubbo";

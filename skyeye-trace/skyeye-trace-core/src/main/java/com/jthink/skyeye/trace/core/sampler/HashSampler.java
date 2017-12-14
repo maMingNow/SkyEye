@@ -7,6 +7,8 @@ package com.jthink.skyeye.trace.core.sampler;
  * @version 0.0.1
  * @desc 基于hash进行采样设计
  * @date 2017-02-15 11:07:38
+ *
+ * 目前尚未实现
  */
 public class HashSampler implements Sampler {
 
