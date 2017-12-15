@@ -30,6 +30,7 @@ public class LogController {
     @Autowired
     private LogQueryService logQueryService;
 
+    //实时ES查询数据---查询某个app host上关于keyword关键字过虑后的结果内容,实时的范围是查询interval之前的 到现在的内容
     @RequestMapping(path = "realtime", method = RequestMethod.GET)
     public BaseMessage realtime(@RequestParam(value = "app", required = false) final String app,
             @RequestParam(value = "host", required = false) final String host,
@@ -47,6 +48,7 @@ public class LogController {
         return msg;
     }
 
+    //查询历史数据
     @RequestMapping(path = "history", method = RequestMethod.POST)
     public BaseMessage history(@RequestBody(required = false) final FilterDto filterDto) {
         BaseMessage msg = new BaseMessage();
@@ -66,6 +68,7 @@ public class LogController {
         return msg;
     }
 
+    //根据sql查询es的数据
     @RequestMapping(path = "query", method = RequestMethod.GET)
     public BaseMessage query(@RequestParam(value = "sql", required = false) final String sql) {
         BaseMessage msg = new BaseMessage();
@@ -85,6 +88,7 @@ public class LogController {
         return msg;
     }
 
+    //查询所有的日志级别
     @RequestMapping(path = "level", method = RequestMethod.GET)
     public BaseMessage level() {
         BaseMessage msg = new BaseMessage();
@@ -104,6 +108,7 @@ public class LogController {
         return msg;
     }
 
+    //查询所有的事件类型
     @RequestMapping(path = "eventType", method = RequestMethod.GET)
     public BaseMessage eventType() {
         BaseMessage msg = new BaseMessage();
@@ -123,6 +128,7 @@ public class LogController {
         return msg;
     }
 
+    //查询提供了哪些操作集合
     @RequestMapping(path = "opt", method = RequestMethod.GET)
     public BaseMessage opt() {
         BaseMessage msg = new BaseMessage();

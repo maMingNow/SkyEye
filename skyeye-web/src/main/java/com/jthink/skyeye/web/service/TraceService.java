@@ -89,6 +89,7 @@ public class TraceService {
      *
      * @param traceId TraceId
      * @return TraceDto
+     * 查询trace表,获取该trace完整的跟踪链条
      */
     public TraceDto getTraceInfo(String traceId) {
         return hBaseTemplate.get(Constants.TABLE_TRACE, traceId, new TraceDto.TraceInfoRowMapper());
@@ -96,7 +97,7 @@ public class TraceService {
 
     /**
      * 批量获取  TraceInfo
-     *
+     * 查询trace表,返回批量traceId集合对应的trace完整跟踪链条集合
      * @param traceIds TraceIds
      * @return List<TraceDto>
      * @throws Exception
@@ -121,13 +122,14 @@ public class TraceService {
     /**
      * 获取符合条件的 Annotation 。
      *
-     * @param sid       sid, iface_method
+     * @param sid       sid, iface_method 接口+服务的method
      * @param type      异常类型。
      * @param startTime 起始时间范围。
      * @param endTime   结束时间范围。
      * @param lastRow   上次请求的最后一行，用于分页。
      * @param pageSize  单页条数。
      * @return List<TraceTimeConsumeDto>
+     * 查询annotation表
      */
     public List<TraceAnnotationDto> getAnnotations(String sid, String type, Long startTime, Long endTime, String
             lastRow, int pageSize) {
@@ -156,7 +158,7 @@ public class TraceService {
 
     /**
      * 根据以下参数获取数据
-     *
+     * 返回统计信息
      * @return
      */
     public List<TraceStatisticsDto> getDatas(String tableName,
@@ -175,7 +177,7 @@ public class TraceService {
         Map<String, Double> doubleMap = new HashMap<>();
         //对rpctrace结果按需返回
         for (TraceStatisticsDto rpcTrace : rpctraces) {
-            String time = rpcTrace.getRowkey().split(Constants.UNDER_LINE)[2];
+            String time = rpcTrace.getRowkey().split(Constants.UNDER_LINE)[2];//获取时间点
             if (scope.equals(Constants.DAY)) {
                 rpcTrace.setTime(time);
             } else if (scope.equals(Constants.WEEK)) {
@@ -199,7 +201,7 @@ public class TraceService {
         return rpctraces;
     }
 
-    //根据条件创建scan
+    //根据条件创建scan--查询某个服务在某个时间点范围内的异常信息
     private Scan buildScan(String serviceName, String methodName, String begin, String end) {
         Scan scan = new Scan();
         List<Filter> filters = new ArrayList<Filter>();

@@ -8,6 +8,7 @@ import org.apache.hadoop.hbase.util.Bytes;
 
 import java.io.Serializable;
 
+//同于统计分析
 public class TraceStatisticsMapper implements RowMapper<TraceStatisticsDto>, Serializable {
 
     @Override

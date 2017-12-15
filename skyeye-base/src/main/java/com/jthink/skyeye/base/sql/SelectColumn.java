@@ -11,13 +11,14 @@ import java.io.Serializable;
  * @version 0.0.1
  * @desc select投影的列
  * @date 2016-11-29 21:10:31
+ * 表示某一个查询的列,即一个列
  */
 public class SelectColumn implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
     // 表名
-    private String table;
+    private String table;//列属于哪个表,用于join操作
     // 列名
     private String column;
     // 去重
@@ -44,16 +45,16 @@ public class SelectColumn implements Serializable {
     public String toString() {
         String str = this.column;
         if (this.table != null) {
-            str = this.table + Constants.POINT + this.column;
+            str = this.table + Constants.POINT + this.column;//table.column
         }
         if (this.distinct) {
             str = "DISTINCT " + str;
         }
         if (this.func != null) {
-            if (Func.COLLECT.equals(this.func)) {
+            if (Func.COLLECT.equals(this.func)) {//说明函数是一个list合并函数
                 str = "CONCAT_WS(',', COLLECT_SET(" + str + "))";
             } else {
-                str = func.name() + "(" + str + ")";
+                str = func.name() + "(" + str + ")";//function(table.column) 或者 function(distinct table.column)
             }
         }
         if (this.alias != null) {

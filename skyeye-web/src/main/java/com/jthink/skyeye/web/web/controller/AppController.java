@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 /**
  * JThink@JThink
- *
+ * 查询app上下架服务
  * @author JThink
  * @version 0.0.1
  * @desc
@@ -36,7 +36,7 @@ public class AppController {
             @RequestParam(value = "host", required = false) final String host) {
         BaseMessage msg = new BaseMessage();
         try {
-            ResponseUtil.buildResMsg(msg, MessageCode.SUCCESS, StatusCode.SUCCESS);
+            ResponseUtil.buildResMsg(msg, MessageCode.SUCCESS, StatusCode.SUCCESS);//表示默认成功
             msg.setData(this.appMonitorService.getHostAppInfo(this.convertStr(host), this.convertStr(app), Constants.ZK_NODE_TYPE_EPHEMERAL));
             return msg;
         } catch (Exception e) {

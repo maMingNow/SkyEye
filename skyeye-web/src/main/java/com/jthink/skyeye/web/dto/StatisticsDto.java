@@ -14,9 +14,9 @@ public class StatisticsDto {
 
     private String time;
 
-    private int succ;
+    private int succ;//成功数
 
-    private int fail;
+    private int fail;//失败数
 
     public StatisticsDto() {
     }

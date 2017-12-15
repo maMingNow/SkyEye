@@ -3,10 +3,10 @@ package com.jthink.skyeye.web.dto;
 import java.io.Serializable;
 
 public class TraceStatisticsDto implements Serializable {
-    private String name;
-    private String time;
-    private String success;
-    private String fail;
+    private String name;//统计的服务名字,比如uri
+    private String time;//单位时间周期
+    private String success;//成功次数
+    private String fail;//失败次数
     private String max;
     private String min;
     private String average;

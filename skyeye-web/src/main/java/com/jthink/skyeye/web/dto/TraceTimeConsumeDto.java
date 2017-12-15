@@ -7,6 +7,7 @@ import java.io.Serializable;
  * @version 0.0.1
  * @desc 对应 HBase 表 time_consume
  * @date 2017-03-30 15:11:06
+ * 表示trace的总耗时
  */
 public class TraceTimeConsumeDto implements Serializable {
 

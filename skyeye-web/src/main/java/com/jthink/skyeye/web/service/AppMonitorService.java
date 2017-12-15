@@ -40,7 +40,7 @@ public class AppMonitorService {
             if (null == app) {
                 return this.appInfoRepository.findBySql(host, type);
             } else {
-                app = app + Constants.PERCENT;
+                app = app + Constants.PERCENT;//模糊查询
                 return this.convert(this.appInfoRepository.findBySql(host, app, type), app);
             }
         }

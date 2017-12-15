@@ -19,7 +19,7 @@ public class Where implements Serializable {
     private static final long serialVersionUID = 1L;
 
     // 条件
-    private List<Condition> conditions;
+    private List<Condition> conditions;//多个条件的集合
 
     public void addCondition(Condition condition) {
         if (this.conditions == null) {

@@ -68,6 +68,8 @@ public class HbaseStore implements Store {
     列族family是span,
     每一个列qualifier是spanId+c或者spanId+s,表示是客户端的spanId还是服务端的spanId
     value是具体的span内容组成的字符串
+
+    一个请求调用为一个span,即一个span的内容分布在连续两个服务器上产生的,hbase上客户端产生一个span,服务器上产生一个相同spanid的span
      */
     @Override
     public Put storeSpan(Span span, String spanJson, Map<String, Annotation> annotationMap) {

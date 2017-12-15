@@ -14,16 +14,17 @@ import static com.jthink.skyeye.base.constant.Constants.TABLE_ANNOTATION_COLUMN_
  * @version 0.0.1
  * @desc 对应 HBase annotation 表
  * @date 2017-03-30 15:15:06
+ *
  */
 public class TraceAnnotationDto {
 
-    private String rowKey;
-    private String iface;
-    private String method;
-    private String type;
-    private Long timestamp;
-    private String traceId;
-    private String value;
+    private String rowKey;//主键
+    private String iface;//提供的接口+服务method
+    private String method;//提供服务的method
+    private String type;//异常类型
+    private Long timestamp;//该备注的时间点
+    private String traceId;//该备注属于哪个trace
+    private String value;//该备注的具体内容
 
 
     @Override
@@ -116,7 +117,7 @@ public class TraceAnnotationDto {
             long timestamp = Long.parseLong(ss[3]);
 
             String traceId = "", value = "";
-            for (Map.Entry<byte[], byte[]> entry : familyMap.entrySet()) {
+            for (Map.Entry<byte[], byte[]> entry : familyMap.entrySet()) {//该时间点产生的所有事件
                 traceId = new String(entry.getKey());
                 value = new String(entry.getValue());
             }

@@ -27,8 +27,9 @@ import java.util.*;
 @ConfigurationProperties(prefix = "spring.statistic.es")
 public class StatisticsService {
 
-    private String url;
+    private String url;//es查询事件日志的请求url
 
+    //以下是各种情况下的sql模版
     private String realtimeTemplate;
 
     private String realtimeAllTemplate;
@@ -110,7 +111,7 @@ public class StatisticsService {
     public List<StatisticsDto> parseStatisticsData(String resp, String name, String groupByFirstField) {
         List<StatisticsDto> rtn = new ArrayList<StatisticsDto>();
         if (null != resp) {
-            JSONObject json = JSON.parseObject(resp);
+            JSONObject json = JSON.parseObject(resp);//es返回的结果是一个json
 
             String time;
             int succ, fail;

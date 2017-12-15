@@ -11,6 +11,7 @@ import java.util.List;
  * @version 0.0.1
  * @desc span定义
  * @date 2016-11-04 09:39:40
+ * 一个请求调用为一个span,即一个span的内容分布在连续两个服务器上产生的,hbase上客户端产生一个span,服务器上产生一个相同spanid的span
  */
 public class Span implements Serializable {
 

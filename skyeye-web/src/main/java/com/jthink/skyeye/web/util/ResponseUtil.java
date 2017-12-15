@@ -63,7 +63,7 @@ public class ResponseUtil {
 
     /**
      * 格式化日志记录数据
-     *
+     * 将es的日志进行转换
      * @param logData
      * @return
      */
@@ -78,7 +78,7 @@ public class ResponseUtil {
         List<String> logs = new ArrayList<>();
         StringBuffer sb;
         JSONObject log;
-        while (iterator.hasNext()) {
+        while (iterator.hasNext()) {//每一个hit对象
             sb = new StringBuffer();
             log = ((JSONObject) iterator.next()).getJSONObject("_source");
 

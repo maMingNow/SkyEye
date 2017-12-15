@@ -50,7 +50,7 @@ public class TraceController {
 
 
     /**
-     * 获取服务信息
+     * 获取服务信息---所有的接口和服务的集合
      *
      * @return serviceInfo
      */
@@ -89,8 +89,8 @@ public class TraceController {
                                      @RequestParam(value = "pageSize", required = false) final Integer pageSize) {
         BaseMessage msg = new BaseMessage();
         try {
-            ArrayList<String> rows = new ArrayList<>();
-            String newLastRow = "";
+            ArrayList<String> rows = new ArrayList<>();//traceId集合
+            String newLastRow = "";//最后一个rowkey
 
             // 若异常类型为空，从 time_consume 表获取 traceId。否则通过 annotation 表获取 traceId。
             if (StringUtils.isEmpty(type)) {
@@ -109,13 +109,13 @@ public class TraceController {
                 }
             }
 
-            List<TraceDto> traceInfos = traceService.getTraceInfos(rows);
+            List<TraceDto> traceInfos = traceService.getTraceInfos(rows);//获取所有traceId集合中对应的链路
             if (pageSize > traceInfos.size()) {
                 newLastRow = null;
             }
 
             Map<String, Object> data = new HashMap<String, Object>();
-            data.put(NEW_LAST_ROW, newLastRow);
+            data.put(NEW_LAST_ROW, newLastRow);//用于分页
             data.put(TRACE_INFOS, traceInfos);
             msg.setData(data);
             ResponseUtil.buildResMsg(msg, MessageCode.SUCCESS, StatusCode.SUCCESS);

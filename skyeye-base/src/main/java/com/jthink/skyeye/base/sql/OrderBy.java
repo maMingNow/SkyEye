@@ -17,7 +17,7 @@ public class OrderBy implements Serializable {
 
     private static final long serialVersionUID = 1L;
     // 排序条件
-    private List<ConditionOrder> conditions;
+    private List<ConditionOrder> conditions;//多个排序条件
 
     public List<ConditionOrder> getConditions() {
         return conditions;
@@ -30,6 +30,7 @@ public class OrderBy implements Serializable {
     @Override
     public String toString() {
 
+        //所有的排序条件使用逗号拆分
         StringBuffer str = new StringBuffer();
         if (this.conditions != null && !this.conditions.isEmpty()) {
             str.append("ORDER BY ").append(this.conditions.get(0).toString());

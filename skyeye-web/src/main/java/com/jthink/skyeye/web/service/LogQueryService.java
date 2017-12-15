@@ -57,27 +57,35 @@ public class LogQueryService {
      * @param app
      * @param interval
      * @return
+     * 创建sql进行查询,返回查询的结果集
+     *
+     * 根据关键字查询某一个host和app的数据,查询有一个时间间隔之前的数据
      */
     public Map<String, Object> getRealtimeLog(String host, String app, String keyword, int interval) {
         DateTime dateTime = new DateTime(System.currentTimeMillis()).minusSeconds(this.delay);
-        String[] intervralDate = dateTime.minusMillis(interval).toString(DateUtil.YYYYMMDDHHMMSSSSS).split(Constants.SPACE);
-        String[] now = dateTime.toString(DateUtil.YYYYMMDDHHMMSSSSS).split(Constants.SPACE);
+        String[] intervralDate = dateTime.minusMillis(interval).toString(DateUtil.YYYYMMDDHHMMSSSSS).split(Constants.SPACE);//开始的时间
+        String[] now = dateTime.toString(DateUtil.YYYYMMDDHHMMSSSSS).split(Constants.SPACE);//查询的结束时间
         StringBuffer sb = new StringBuffer();
+        /**
+         * 拼装sql的where条件
+         * host = '${host}' and APP = '${app}' and MESSAGE_MAX = '${keyword}' 因为已经分词了,所以相当于like
+         * and DAY = '${开始day}'  and TIME >= '${开始time}'  and time <= '${结束的time}' order by nanoTime asc
+         */
         sb.append(Constants.HOST).append(Constants.EQUAL)
-                .append(Constants.SINGLE_PHE).append(host).append(Constants.SINGLE_PHE).append(Constants.SPACE)
+                .append(Constants.SINGLE_PHE).append(host).append(Constants.SINGLE_PHE).append(Constants.SPACE) //host = '${host}'
                 .append(Constants.AND).append(Constants.SPACE).append(Constants.APP).append(Constants.EQUAL)
-                .append(Constants.SINGLE_PHE).append(app).append(Constants.SINGLE_PHE).append(Constants.SPACE);
+                .append(Constants.SINGLE_PHE).append(app).append(Constants.SINGLE_PHE).append(Constants.SPACE); //and APP = '${app}'
                 if (!StringUtils.isEmpty(keyword)) {
                     sb.append(Constants.AND).append(Constants.SPACE).append(Constants.MESSAGE_MAX).append(Constants.EQUAL)
-                      .append(Constants.SINGLE_PHE).append(keyword).append(Constants.SINGLE_PHE).append(Constants.SPACE);
+                      .append(Constants.SINGLE_PHE).append(keyword).append(Constants.SINGLE_PHE).append(Constants.SPACE);// and MESSAGE_MAX = '${keyword}' 因为已经分词了,所以相当于like
                 }
                 sb.append(Constants.AND).append(Constants.SPACE).append(Constants.DAY).append(Constants.EQUAL)
-                .append(Constants.SINGLE_PHE).append(intervralDate[0]).append(Constants.SINGLE_PHE).append(Constants.SPACE)
+                .append(Constants.SINGLE_PHE).append(intervralDate[0]).append(Constants.SINGLE_PHE).append(Constants.SPACE) // and DAY = '${开始day}'
                 .append(Constants.AND).append(Constants.SPACE).append(Constants.TIME).append(Constants.GEQUAL)
-                .append(Constants.SINGLE_PHE).append(intervralDate[1]).append(Constants.SINGLE_PHE).append(Constants.SPACE)
+                .append(Constants.SINGLE_PHE).append(intervralDate[1]).append(Constants.SINGLE_PHE).append(Constants.SPACE) // and TIME >= '${开始time}'
                 .append(Constants.AND).append(Constants.SPACE).append(Constants.TIME).append(Constants.LEQUAL)
-                .append(Constants.SINGLE_PHE).append(now[1]).append(Constants.SINGLE_PHE)
-                .append(Constants.NANO_TIME_ORDER_BY_ASC);
+                .append(Constants.SINGLE_PHE).append(now[1]).append(Constants.SINGLE_PHE) // and time <= '${结束的time}'
+                .append(Constants.NANO_TIME_ORDER_BY_ASC); //order by nanoTime asc
 
         return this.parseEsResponse(this.query(sb.toString()));
     }
@@ -101,7 +109,7 @@ public class LogQueryService {
     }
 
     /**
-     * 解析log
+     * 解析log---解析es的查询结果集
      * @param response
      * @return
      */
@@ -111,7 +119,7 @@ public class LogQueryService {
             // 错误
             return null;
         } else {
-            JSONObject json = JSON.parseObject(response);
+            JSONObject json = JSON.parseObject(response);//转换成json对象
             List<NoneDupeLogDto> logs = new ArrayList<NoneDupeLogDto>();
             JSONObject hits = json.getJSONObject("hits");
             Iterator<Object> iterator = hits.getJSONArray("hits").iterator();

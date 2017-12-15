@@ -8,6 +8,7 @@ package com.jthink.skyeye.web.util;
  */
 public class RadixUtil {
 
+    //字节数组转换成long
     public static Long bytesToLong(byte[] bytes) {
         String zero = "00000000";
         StringBuilder num = new StringBuilder();

@@ -40,6 +40,7 @@ public class Select implements Serializable {
      * 添加一个查询的列
      * @param table
      * @param column
+     * 列属于哪个表,用于join操作
      */
     public void addColumn(String table, String column) {
         this.addColumn(new SelectColumn(table, column));

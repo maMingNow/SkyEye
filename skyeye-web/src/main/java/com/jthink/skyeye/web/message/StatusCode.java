@@ -5,7 +5,7 @@ package com.jthink.skyeye.web.message;
  *
  * @author JThink
  * @version 0.0.1
- * @desc 状态码
+ * @desc 状态码----表示具体的错误的代码含义
  * @date 2016-10-09 09:15:34
  */
 public enum StatusCode {

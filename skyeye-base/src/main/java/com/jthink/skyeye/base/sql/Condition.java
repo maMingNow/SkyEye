@@ -35,12 +35,19 @@ public class Condition implements Serializable {
         if (this.column == null || this.opt == null) {
             return false;
         }
-        if (!this.opt.equals(Opt.IS_NULL) && this.value == null) {
+        if (!this.opt.equals(Opt.IS_NULL) && this.value == null) {//说明是is null操作
             return false;
         }
         return true;
     }
 
+    /**
+     * 可能性
+     * 1.function(column) = 'value' 或者 column = 'value'
+     * 2.function(column) opt value
+     * 3.function(column) opt ,比如opt等于is null
+     *
+     */
     @Override
     public String toString() {
         String str = Constants.EMPTY_STR;

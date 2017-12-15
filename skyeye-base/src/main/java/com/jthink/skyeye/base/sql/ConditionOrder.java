@@ -9,7 +9,7 @@ import java.io.Serializable;
  *
  * @author JThink
  * @version 0.0.1
- * @desc order by 的条件描述
+ * @desc order by 的条件描述---表示一个字段的排序内容
  * @date 2016-11-29 20:15:41
  */
 public class ConditionOrder implements Serializable {

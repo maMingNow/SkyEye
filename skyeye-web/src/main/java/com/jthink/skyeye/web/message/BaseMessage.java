@@ -13,7 +13,7 @@ import org.codehaus.jackson.map.annotate.JsonSerialize;
 public class BaseMessage extends Message<Object> {
 
     @JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
-    private Object data;
+    private Object data;//json数据对象
 
     public BaseMessage() {
         super();
