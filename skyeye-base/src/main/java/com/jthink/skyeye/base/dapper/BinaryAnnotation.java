@@ -7,7 +7,7 @@ import java.io.Serializable;
  *
  * @author JThink
  * @version 0.0.1
- * @desc 自定义annotation
+ * @desc 自定义annotation ---用于存储节点产生的错误日志信息
  * @date 2016-11-04 17:32:31
  */
 public class BinaryAnnotation implements Serializable {
@@ -17,9 +17,9 @@ public class BinaryAnnotation implements Serializable {
     // 自定义value
     private String value;
     // 类型
-    private String type;
+    private String type;//异常类型是dubbo异常还是超时异常---参见ExceptionType
     // endpoint
-    private EndPoint endPoint;
+    private EndPoint endPoint;//哪个节点发送的错误
 
     public BinaryAnnotation() {
 

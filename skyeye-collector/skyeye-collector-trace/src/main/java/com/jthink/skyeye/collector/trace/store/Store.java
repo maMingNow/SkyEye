@@ -43,9 +43,9 @@ public interface Store {
     List<Put> storeAnnotation(Span span, Map<String, Annotation> annotationMap);
 
     /**
-     * 存储所有的信息
-     * @param spanJson
-     * @param span
+     * 存储所有的信息--即解析span,分别调用前面三个方法进行真实的保存
+     * @param spanJson 具体的span中打印的字符串
+     * @param span span对象
      * @return
      */
     Map<String, List<Put>> store(String spanJson, Span span);

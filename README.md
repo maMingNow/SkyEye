@@ -1,3 +1,5 @@
+dubbo的rcp埋点---详细参见maMingNow/dubbox---下面的branch--skyeye-trace-1.3.0,路径dubbox/dubbo-rpc/dubbo-rpc-api/src/main/java/com/alibaba/dubbo/rpc/filter/trace/RpcTraceFilter.java
+
 # SkyEye
 对java、scala等运行于jvm的程序进行实时日志采集、索引和可视化，对系统进行进程级别的监控，对系统内部的操作进行策略性的报警、对分布式的rpc调用进行trace跟踪以便于进行性能分析
 

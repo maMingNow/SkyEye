@@ -12,10 +12,10 @@ import com.jthink.skyeye.base.constant.Constants;
  */
 public enum AnnotationType {
 
-    CS(Constants.CS_KEY, Constants.CS_VALUE),
-    SR(Constants.SR_KEY, Constants.SR_VALUE),
-    SS(Constants.SS_KEY, Constants.SS_VALUE),
-    CR(Constants.CR_KEY, Constants.CR_VALUE);
+    CS(Constants.CS_KEY, Constants.CS_VALUE),//cs和client send
+    SR(Constants.SR_KEY, Constants.SR_VALUE),//sr和server receive
+    SS(Constants.SS_KEY, Constants.SS_VALUE),//ss和server send
+    CR(Constants.CR_KEY, Constants.CR_VALUE);//cr和client receive
 
     private String symbol;
 

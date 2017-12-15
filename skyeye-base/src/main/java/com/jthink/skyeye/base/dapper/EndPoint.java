@@ -9,6 +9,8 @@ import java.io.Serializable;
  * @version 0.0.1
  * @desc endpoint定义
  * @date 2016-11-04 17:32:03
+ *
+ * 定义本地调用服务的ip和port
  */
 public class EndPoint implements Serializable {
 

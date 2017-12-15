@@ -80,7 +80,7 @@ public class Constants {
 
     // rpc trace跟踪hbase表相关
     public static final String TABLE_TRACE = "trace";
-    public static final String TABLE_TRACE_COLUMN_FAMILY = "span";
+    public static final String TABLE_TRACE_COLUMN_FAMILY = "span";//列族
     public static final String TABLE_ANNOTATION = "annotation";
     public static final String TABLE_ANNOTATION_COLUMN_FAMILY = "trace";
     public static final String TABLE_TIME_CONSUME = "time_consume";

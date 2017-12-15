@@ -13,11 +13,11 @@ import java.io.Serializable;
 public class Annotation implements Serializable {
 
     // 时间戳
-    private Long timestamp;
+    private Long timestamp;//什么时间点发生的该事件
     // annotation的value, 取自AnnotationType的symbol
-    private String value;
+    private String value;//此时事件的类型
     // endpoint
-    private EndPoint endPoint;
+    private EndPoint endPoint;//哪个节点发生的该事件
 
     public Annotation() {
 

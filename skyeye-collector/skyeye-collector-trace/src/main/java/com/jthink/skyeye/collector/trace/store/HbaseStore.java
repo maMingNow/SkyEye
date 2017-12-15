@@ -27,23 +27,26 @@ public class HbaseStore implements Store {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(HbaseStore.class);
 
+    /**
+     * 返回值key是要保存的hbase的表名,value是该表要保存的数据集合
+     */
     @Override
     public Map<String, List<Put>> store(String spanJson, Span span) {
         // 将所有的Put返回到上游
         Map<String, List<Put>> puts = new HashMap<String, List<Put>>();
         if (span.getSample()) {
-            // 区分出所有的annotation
+            // 区分出所有的annotation----将List转换成Map,key是Annotation的type类型,比如是cs还是ss等
             Map<String, Annotation> annotationMap = this.distinguishAnnotation(span.getAnnotations());
-            Put spanPut = this.storeSpan(span, spanJson, annotationMap);
-            Put tracePut = this.storeTrace(span, annotationMap);
-            List<Put> annotationPuts = this.storeAnnotation(span, annotationMap);
+            Put spanPut = this.storeSpan(span, spanJson, annotationMap);//trace表:
+            Put tracePut = this.storeTrace(span, annotationMap);//索引表time_consume, 保存每个trace耗时
+            List<Put> annotationPuts = this.storeAnnotation(span, annotationMap);//该方法可以通过某个服务+某个异常+时间范围,可以筛选出此时出现了哪些异常,并且通过rowkey是traceId,可以找到某一个traceId出现过的异常
 
-            puts.put(Constants.TABLE_TRACE, Lists.newArrayList(spanPut));
+            puts.put(Constants.TABLE_TRACE, Lists.newArrayList(spanPut));//trace
             if (null != tracePut) {
-                puts.put(Constants.TABLE_TIME_CONSUME, Lists.newArrayList(tracePut));
+                puts.put(Constants.TABLE_TIME_CONSUME, Lists.newArrayList(tracePut));//time_consume
             }
             if (null != annotationPuts) {
-                puts.put(Constants.TABLE_ANNOTATION, annotationPuts);
+                puts.put(Constants.TABLE_ANNOTATION, annotationPuts);//annotation
             }
 
         }
@@ -60,6 +63,11 @@ public class HbaseStore implements Store {
      * @param spanJson
      * @param annotationMap
      * @return
+    1.trace表:
+    rowkey是traceId,
+    列族family是span,
+    每一个列qualifier是spanId+c或者spanId+s,表示是客户端的spanId还是服务端的spanId
+    value是具体的span内容组成的字符串
      */
     @Override
     public Put storeSpan(Span span, String spanJson, Map<String, Annotation> annotationMap) {
@@ -73,6 +81,7 @@ public class HbaseStore implements Store {
             spanId += NodeProperty.S.symbol();
         }
         Put put = new Put(Bytes.toBytes(traceId));
+        //向span列族添加spanId的列,列的值是span具体内容
         put.addColumn(Bytes.toBytes(Constants.TABLE_TRACE_COLUMN_FAMILY), Bytes.toBytes(spanId), Bytes.toBytes(spanJson));
 
         return put;
@@ -87,15 +96,23 @@ public class HbaseStore implements Store {
      * @param span
      * @param annotationMap
      * @return
+     *
+    索引表time_consume, 保存每个trace耗时
+    该方法保存每一个trace的整体耗时时间
+
+    rowkey是接口+method+开始时间
+    columnFamily列族是trace
+    qualifier列名是由traceId组成
+    value是该trace从开始到结束的用时
      */
     @Override
     public Put storeTrace(Span span, Map<String, Annotation> annotationMap) {
         if (null == span.getParentId() && annotationMap.containsKey(AnnotationType.CS.symbol())) {
             // 是root span, 并且是client端
-            Annotation csAnnotation = annotationMap.get(AnnotationType.CS.symbol());
-            Annotation crAnnotation = annotationMap.get(AnnotationType.CR.symbol());
+            Annotation csAnnotation = annotationMap.get(AnnotationType.CS.symbol());//开始时间
+            Annotation crAnnotation = annotationMap.get(AnnotationType.CR.symbol());//结束时间
 
-            long consumeTime = crAnnotation.getTimestamp() - csAnnotation.getTimestamp();
+            long consumeTime = crAnnotation.getTimestamp() - csAnnotation.getTimestamp();//消耗时间
             String rowKey = span.getServiceId() + Constants.UNDER_LINE + csAnnotation.getTimestamp();
             Put put = new Put(Bytes.toBytes(rowKey));
             put.addColumn(Bytes.toBytes(Constants.TABLE_TIME_CONSUME_COLUMN_FAMILY), Bytes.toBytes(span.getTraceId()),
@@ -114,17 +131,29 @@ public class HbaseStore implements Store {
      * @param span
      * @param annotationMap
      * @return
+     * 该方法可以通过某个服务+某个异常+时间范围,可以筛选出此时出现了哪些异常,并且通过rowkey是traceId,可以找到某一个traceId出现过的异常
+     *
+    索引表annotation
+    该方法可以通过某个服务+某个异常+时间范围,可以筛选出此时出现了哪些异常,
+    该方法可以知道异常都是哪个traceId打印出来的
+
+    rowkey是接口+method+_+异常类型+_+发生异常的时间点
+    列族是trace,
+    列是traceid,
+    value是自定义的value信息,即异常信息内容
      */
     @Override
     public List<Put> storeAnnotation(Span span, Map<String, Annotation> annotationMap) {
         List<BinaryAnnotation> annotations = span.getBinaryAnnotations();
-        if (null != annotations && annotations.size() != 0) {
+        if (null != annotations && annotations.size() != 0) {//说明该span有异常信息
             List<Put> puts = new ArrayList<Put>();
             // 如果有自定义异常
             for (BinaryAnnotation annotation : annotations) {
                 String rowKey = span.getServiceId() + Constants.UNDER_LINE + annotation.getType()
                         + Constants.UNDER_LINE + this.getBinaryAnnotationTimestamp(annotationMap);
+                //rowkey是接口+method+_+异常类型+_+发生异常的时间点
                 Put put = new Put(Bytes.toBytes(rowKey));
+                //列族是trace,列是traceid,value是自定义的value信息
                 put.addColumn(Bytes.toBytes(Constants.TABLE_ANNOTATION_COLUMN_FAMILY), Bytes.toBytes(span.getTraceId()),
                         Bytes.toBytes(annotation.getValue() == null ? annotation.getType() : annotation.getValue()));
                 puts.add(put);
@@ -141,7 +170,7 @@ public class HbaseStore implements Store {
      */
     private Long getBinaryAnnotationTimestamp(Map<String, Annotation> annotationMap) {
         Long timestamp = System.currentTimeMillis();
-        if (annotationMap.containsKey(AnnotationType.CS.symbol())) {
+        if (annotationMap.containsKey(AnnotationType.CS.symbol())) {//发生异常的时间点
             // cs
             timestamp = annotationMap.get(AnnotationType.CS.symbol()).getTimestamp();
         }
@@ -157,6 +186,7 @@ public class HbaseStore implements Store {
      * 区分出不同的annotation
      * @param annotations
      * @return
+     * 将List转换成Map,key是Annotation的type类型,比如是cs还是ss等
      */
     private Map<String, Annotation> distinguishAnnotation(List<Annotation> annotations) {
         Map<String, Annotation> annotationMap = new HashMap<String, Annotation>();
